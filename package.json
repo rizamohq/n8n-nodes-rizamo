@@ -1,0 +1,64 @@
+{
+    "name": "@rizamohq/n8n-nodes-rizamo",
+    "version": "0.1.0",
+    "description": "n8n nodes for Rizamo: publish and schedule social posts on Instagram, Facebook, TikTok, YouTube and Threads, answer comments and messages, and read analytics.",
+    "license": "MIT",
+    "homepage": "https://github.com/rizamohq/n8n-nodes-rizamo#readme",
+    "keywords": [
+        "n8n-community-node-package",
+        "n8n",
+        "rizamo",
+        "social-media",
+        "instagram",
+        "tiktok",
+        "youtube",
+        "facebook",
+        "threads",
+        "scheduling"
+    ],
+    "author": {
+        "name": "Rizamo",
+        "email": "hi@rizamo.com",
+        "url": "https://rizamo.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rizamohq/n8n-nodes-rizamo.git"
+    },
+    "scripts": {
+        "build": "n8n-node build",
+        "build:watch": "tsc --watch",
+        "dev": "n8n-node dev",
+        "lint": "n8n-node lint",
+        "lint:fix": "n8n-node lint --fix",
+        "release": "n8n-node release",
+        "prepublishOnly": "n8n-node prerelease"
+    },
+    "files": [
+        "dist"
+    ],
+    "n8n": {
+        "n8nNodesApiVersion": 1,
+        "strict": true,
+        "credentials": [
+            "dist/credentials/RizamoApi.credentials.js"
+        ],
+        "nodes": [
+            "dist/nodes/Rizamo/Rizamo.node.js",
+            "dist/nodes/RizamoTrigger/RizamoTrigger.node.js"
+        ]
+    },
+    "devDependencies": {
+        "@n8n/node-cli": "*",
+        "eslint": "9.32.0",
+        "prettier": "3.6.2",
+        "release-it": "^21.1.0",
+        "typescript": "5.9.2"
+    },
+    "peerDependencies": {
+        "n8n-workflow": "*"
+    },
+    "bugs": {
+        "url": "https://github.com/rizamohq/n8n-nodes-rizamo/issues"
+    }
+}

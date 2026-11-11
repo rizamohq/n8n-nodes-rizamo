@@ -1,0 +1,10 @@
+{
+	"node": "@rizamohq/n8n-nodes-rizamo.rizamoTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Marketing & Content", "Communication"],
+	"resources": {
+		"credentialDocumentation": [{ "url": "https://docs.rizamo.com/authentication" }],
+		"primaryDocumentation": [{ "url": "https://github.com/rizamohq/n8n-nodes-rizamo#readme" }]
+	}
+}
