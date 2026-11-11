@@ -60,5 +60,8 @@
     },
     "bugs": {
         "url": "https://github.com/rizamohq/n8n-nodes-rizamo/issues"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }
