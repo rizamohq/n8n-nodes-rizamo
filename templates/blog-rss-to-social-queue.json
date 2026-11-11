@@ -1,0 +1,76 @@
+{
+  "name": "Share new blog articles on social media from RSS with Rizamo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Share new blog articles from RSS\n\nEvery new article in your feed is added to a Rizamo profile's queue, so it goes out at the next free posting time.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Put your feed's address in **New article**.\n5. In **Add to queue**, pick the profile and accounts.\n\nInstagram and TikTok need an image or video: set Media to File URLs and map your feed's image there.",
+        "width": 440,
+        "height": 560
+      },
+      "id": "21c7f3a0-145d-4e6b-904e-d990639a7782",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "feedUrl": "https://your-blog.com/feed",
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        }
+      },
+      "id": "eb94a137-7d82-49c2-ba22-8a97c133421a",
+      "name": "New article",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "profileId": "",
+        "accountIds": [],
+        "text": "={{ $json.title }}\n\n{{ $json.contentSnippet ? $json.contentSnippet.slice(0, 200) + '...\\n\\n' : '' }}{{ $json.link }}",
+        "when": "queue",
+        "mediaSource": "none",
+        "additionalFields": {}
+      },
+      "id": "6b7af1ba-0f50-40ba-9cda-5dde88170fda",
+      "name": "Add to queue",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "New article": {
+      "main": [
+        [
+          {
+            "node": "Add to queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

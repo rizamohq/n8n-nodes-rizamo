@@ -9,7 +9,7 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionTypes } from 'n8n-workflow';
 
-import { getProfiles, rizamoRequest } from '../Rizamo/GenericFunctions';
+import { getProfiles, rizamoRequest, splitList } from '../Rizamo/GenericFunctions';
 
 /** Rizamo's event types (WebhookEventType). */
 const EVENTS: Array<{ name: string; value: string; description: string }> = [
@@ -116,7 +116,7 @@ export class RizamoTrigger implements INodeType {
 
 			async create(this: IHookFunctions): Promise<boolean> {
 				const events = this.getNodeParameter('events') as string[];
-				const profileIds = this.getNodeParameter('profileIds', []) as string[];
+				const profileIds = splitList(this.getNodeParameter('profileIds', []));
 				const workflow = this.getWorkflow();
 				const body: IDataObject = {
 					url: this.getNodeWebhookUrl('default'),

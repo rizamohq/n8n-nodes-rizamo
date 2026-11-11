@@ -51,6 +51,10 @@ The trigger offers every Rizamo event, such as `post.published`, `post.failed`, 
 
 **The trigger** needs an address Rizamo can reach: https on the public internet. n8n Cloud and most hosted n8n have one; on your own computer, use a tunnel. Activating a workflow creates a webhook endpoint in Rizamo (shown under Developers, named after the workflow), and deactivating it deletes it. Each delivery's signature is checked.
 
+## Templates
+
+Five workflows to import, each with a sticky note on setup: blog RSS to the queue, clients' posts from Google Sheets, new Shopify products, a weekly report to Slack, and AI-drafted comment replies approved in Slack. See [templates](templates/).
+
 ## Compatibility
 
 Built with n8n's node CLI 0.56 and tried on n8n 2.47 as an installed community package.

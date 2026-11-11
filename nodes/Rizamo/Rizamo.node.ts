@@ -54,7 +54,8 @@ function networkOptions(this: IExecuteFunctions, i: number): Record<string, IDat
 
 async function createPost(this: IExecuteFunctions, i: number): Promise<IDataObject> {
 	const profileId = this.getNodeParameter('profileId', i) as string;
-	const accountIds = this.getNodeParameter('accountIds', i) as string[];
+	// A list, or IDs separated by commas when an expression maps them from a sheet.
+	const accountIds = splitList(this.getNodeParameter('accountIds', i));
 	const text = this.getNodeParameter('text', i) as string;
 	const when = this.getNodeParameter('when', i) as string;
 	const mediaSource = this.getNodeParameter('mediaSource', i) as string;

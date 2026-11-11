@@ -1,0 +1,229 @@
+{
+  "name": "Schedule clients' social posts from Google Sheets with Rizamo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Schedule clients' posts from a Google Sheet\n\nEach row with Status **Ready** becomes a scheduled post on the client's Rizamo profile. The row is then marked **Scheduled** with the post's ID.\n\n### The sheet\nColumns: **Profile ID** (prof_...), **Account IDs** (acc_..., separated by commas), **Text**, **Media URLs** (public links, separated by commas, may be empty), **Publish at** (e.g. 2026-12-01 09:00, in the profile's time zone), **Status**, **Post ID**.\n\nGet the IDs with the Rizamo node's Get Many on Profile and Account.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Pick your sheet in **Read rows** and **Mark scheduled**.",
+        "width": 480,
+        "height": 680
+      },
+      "id": "defbe122-6116-4005-96a9-ca100e7ca01f",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "3c8ebc3b-59fa-439b-bbf7-a17f2d59fa02",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "id": "c547be72-77fd-43b6-a12b-a110f468dad7",
+      "name": "Read rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00f20ddd-ac12-4914-851c-c6bdd29e8cb1",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "913ff730-d823-459b-ae90-e030b2389198",
+      "name": "Ready",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "profileId": "={{ $json['Profile ID'] }}",
+        "accountIds": "={{ String($json['Account IDs']).split(',').map(s => s.trim()).filter(Boolean) }}",
+        "text": "={{ $json.Text }}",
+        "when": "schedule",
+        "scheduledAt": "={{ String($json['Publish at']).trim().replace(' ', 'T') }}",
+        "mediaSource": "urls",
+        "mediaUrls": "={{ $json['Media URLs'] || '' }}",
+        "additionalFields": {}
+      },
+      "id": "35afe47f-b351-4e85-96ef-540c37d8c955",
+      "name": "Schedule post",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Ready').item.json.row_number }}",
+            "Status": "Scheduled",
+            "Post ID": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "34404c78-8b4f-4126-881a-b4e2887a8310",
+      "name": "Mark scheduled",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Read rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read rows": {
+      "main": [
+        [
+          {
+            "node": "Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ready": {
+      "main": [
+        [
+          {
+            "node": "Schedule post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule post": {
+      "main": [
+        [
+          {
+            "node": "Mark scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "name": "Draft replies to social media comments with AI and approve them in Slack with Rizamo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## AI-drafted comment replies, approved in Slack\n\nA new comment arrives, OpenAI drafts a reply, and Slack asks a person to approve it. Rizamo replies only after an approval.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Connect OpenAI in **Draft a reply** and edit its instructions to your brand's voice.\n5. Connect Slack and pick the channel in **Ask for approval**.\n6. Activate the workflow: the trigger creates its webhook in Rizamo (https only, so n8n needs a public address).",
+        "width": 460,
+        "height": 600
+      },
+      "id": "b8ae0767-9090-4d9c-b14a-45aefc837e76",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "events": [
+          "comment.received"
+        ],
+        "profileIds": []
+      },
+      "id": "e4295522-0546-4771-a05b-da2da1133a81",
+      "name": "New comment",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamoTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You reply to comments on a brand's social media posts. Write one short, friendly reply in the comment's language, at most two sentences, with no hashtags. If the comment is spam or needs a person (a complaint, an order problem), reply only with SKIP."
+            },
+            {
+              "content": "=Comment from {{ $json.data.author.name }} on {{ $json.data.network }}:\n{{ $json.data.text }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "5b4a4b7f-36b4-4c5b-867f-4d32ca0396b3",
+      "name": "Draft a reply",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bac2d145-5fee-46b7-a0e5-a4cd3c5490b6",
+              "leftValue": "={{ $json.message.content.trim() }}",
+              "rightValue": "SKIP",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "665a6fc2-fe47-4324-9f4e-73d05eceb282",
+      "name": "Worth replying",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "message": "=*New comment* from {{ $('New comment').item.json.data.author.name }} on {{ $('New comment').item.json.data.network }}:\n> {{ $('New comment').item.json.data.text }}\n\n*Draft reply:*\n{{ $json.message.content }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Reply",
+            "disapproveLabel": "Skip"
+          }
+        },
+        "options": {}
+      },
+      "id": "60b9528f-6ff2-4d6b-912b-9e44444b13ef",
+      "name": "Ask for approval",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e20b5c2b-f690-4ced-ae67-1118711ef9ec",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5161a9ca-71e7-48e6-96d9-d9d1c729faf4",
+      "name": "Approved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('New comment').item.json.data.threadId }}",
+        "text": "={{ $('Draft a reply').item.json.message.content.trim() }}"
+      },
+      "id": "ae986d2f-055d-41f7-8966-c9304e6647c5",
+      "name": "Reply",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -100
+      ]
+    }
+  ],
+  "connections": {
+    "New comment": {
+      "main": [
+        [
+          {
+            "node": "Draft a reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft a reply": {
+      "main": [
+        [
+          {
+            "node": "Worth replying",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Worth replying": {
+      "main": [
+        [
+          {
+            "node": "Ask for approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask for approval": {
+      "main": [
+        [
+          {
+            "node": "Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

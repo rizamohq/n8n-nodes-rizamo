@@ -1,0 +1,72 @@
+{
+  "name": "Post new Shopify products to Instagram and Facebook with Rizamo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Post new Shopify products\n\nA new product in Shopify becomes a post in your Rizamo queue, with its first photo, its title, a short description and its link.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Connect Shopify in **New product**.\n5. In **Add to queue**, pick the profile and accounts, and replace your-store.com with your store's address.",
+        "width": 440,
+        "height": 520
+      },
+      "id": "4abcc839-ef6c-41ce-acf8-11696b91d181",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "topic": "products/create"
+      },
+      "id": "f3db2675-694c-4132-9da2-d9b8cf89a408",
+      "name": "New product",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "profileId": "",
+        "accountIds": [],
+        "text": "=New in: {{ $json.title }}\n\n{{ ($json.body_html || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 220) }}\n\nhttps://your-store.com/products/{{ $json.handle }}",
+        "when": "queue",
+        "mediaSource": "urls",
+        "mediaUrls": "={{ $json.image?.src || ($json.images?.[0]?.src ?? '') }}",
+        "additionalFields": {
+          "alt": "={{ $json.title }}"
+        }
+      },
+      "id": "2f959579-85bb-4555-a61d-db4d0917e609",
+      "name": "Add to queue",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "New product": {
+      "main": [
+        [
+          {
+            "node": "Add to queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
