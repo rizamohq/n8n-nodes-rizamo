@@ -6,6 +6,7 @@ import type {
 	IHttpRequestMethods,
 	IHttpRequestOptions,
 	ILoadOptionsFunctions,
+	INode,
 	INodePropertyOptions,
 	IWebhookFunctions,
 	JsonObject,
@@ -42,7 +43,14 @@ function rizamoError(error: unknown): { message?: string; code?: string } {
 	const e = error as IDataObject | undefined;
 	const response = e?.response as IDataObject | undefined;
 	const cause = e?.cause as IDataObject | undefined;
-	candidates.push(response?.data, response?.body, (cause?.response as IDataObject | undefined)?.data, e?.error);
+	// n8n wraps a failed request in a NodeApiError that keeps the body in `context.data`.
+	candidates.push(
+		(e?.context as IDataObject | undefined)?.data,
+		response?.data,
+		response?.body,
+		(cause?.response as IDataObject | undefined)?.data,
+		e?.error,
+	);
 	for (const candidate of candidates) {
 		let body = candidate;
 		if (typeof body === 'string') {
@@ -57,6 +65,10 @@ function rizamoError(error: unknown): { message?: string; code?: string } {
 		if (inner && typeof inner === 'object' && typeof inner.message === 'string') {
 			return { message: inner.message, code: typeof inner.code === 'string' ? inner.code : undefined };
 		}
+	}
+	// n8n put the body's message in the description and a generic one in the message.
+	if (e instanceof NodeApiError && typeof e.description === 'string' && e.description) {
+		return { message: e.description };
 	}
 	return {};
 }
@@ -93,12 +105,29 @@ export async function rizamoRequest(
 	try {
 		return await this.helpers.httpRequestWithAuthentication.call(this, 'rizamoApi', options);
 	} catch (error) {
-		const { message, code } = rizamoError(error);
-		throw new NodeApiError(this.getNode(), error as JsonObject, {
-			...(message ? { message } : {}),
-			...(code ? { description: `Rizamo error code: ${code}` } : {}),
-		});
+		throw rizamoNodeError(this.getNode(), error);
 	}
+}
+
+/**
+ * The error n8n shows, with Rizamo's own message as its title. n8n already wraps a failed request in a NodeApiError,
+ * and wrapping one again hands back the same error with its options ignored, so the message is set on it directly.
+ */
+export function rizamoNodeError(node: INode, error: unknown, fallback?: string, itemIndex?: number): NodeApiError {
+	const { message, code } = rizamoError(error);
+	const title = message ?? fallback;
+	const description = code ? `Rizamo error code: ${code}` : undefined;
+	if (error instanceof NodeApiError) {
+		if (title) error.message = title;
+		error.description = description ?? (error.description === title ? null : error.description);
+		if (itemIndex !== undefined) error.context.itemIndex = itemIndex;
+		return error;
+	}
+	return new NodeApiError(node, error as JsonObject, {
+		...(title ? { message: title } : {}),
+		...(description ? { description } : {}),
+		...(itemIndex !== undefined ? { itemIndex } : {}),
+	});
 }
 
 /** Every item of a list that pages with `nextCursor`, up to `limit` when given. */
@@ -205,11 +234,7 @@ export async function uploadBinary(
 			answer = await this.helpers.httpRequest({ method: 'POST', url: created.upload.complete.url, json: true });
 		}
 	} catch (error) {
-		const { message } = rizamoError(error);
-		throw new NodeApiError(this.getNode(), error as JsonObject, {
-			message: message ?? `Uploading "${binaryPropertyName}" to Rizamo failed`,
-			itemIndex,
-		});
+		throw rizamoNodeError(this.getNode(), error, `Uploading "${binaryPropertyName}" to Rizamo failed`, itemIndex);
 	}
 
 	let done = answer as { media?: IDataObject; error?: string | null } | string | undefined;

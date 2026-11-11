@@ -53,7 +53,7 @@ The trigger offers every Rizamo event, such as `post.published`, `post.failed`, 
 
 ## Compatibility
 
-Built with n8n's node CLI 0.56 against `n8n-workflow` 2.47.
+Built with n8n's node CLI 0.56 and tried on n8n 2.47 as an installed community package.
 
 ## Resources
 

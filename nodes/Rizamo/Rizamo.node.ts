@@ -4,9 +4,8 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	JsonObject,
 } from 'n8n-workflow';
-import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { accountFields, accountOperations, profileFields, profileOperations } from './descriptions/AccountDescription';
 import { analyticsFields, analyticsOperations } from './descriptions/AnalyticsDescription';
@@ -20,6 +19,7 @@ import {
 	idempotencyKey,
 	importUrl,
 	rizamoRequest,
+	rizamoNodeError,
 	rizamoRequestAllItems,
 	splitList,
 	uploadBinary,
@@ -383,13 +383,7 @@ export class Rizamo implements INodeType {
 						description: error.description ?? undefined,
 					});
 				}
-				const apiError = error as NodeApiError;
-				throw new NodeApiError(this.getNode(), (apiError.cause ?? error) as JsonObject, {
-					itemIndex: i,
-					message: apiError.message,
-					description: apiError.description ?? undefined,
-					httpCode: apiError.httpCode ?? undefined,
-				});
+				throw rizamoNodeError(this.getNode(), error, undefined, i);
 			}
 		}
 
