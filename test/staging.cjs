@@ -172,29 +172,30 @@ async function run(label, params, items) {
 		assert.equal(mediaAgain.id, media.id, 'a retried upload made a second file');
 	await run('get the media', { resource: 'media', operation: 'get', mediaId: media.id });
 
-	// A short link n8n tries again in the same execution: the same link comes back.
-	const link = {
-		resource: 'link',
-		operation: 'create',
-		url: 'https://rizamo.com/',
-		additionalFields: { utmSource: 'n8n', utmCampaign: 'node-check' },
-	};
-	const [made] = await run('create a short link', link);
-	const [madeAgain] = await run('create it again in the same execution', link);
-	if (process.env.RIZAMO_DEMO !== '1')
-		assert.equal(madeAgain.id, made.id, 'a retry made a second link');
-	await run('get the link', { resource: 'link', operation: 'get', linkId: made.id });
-	for (const id of new Set([made.id, madeAgain.id])) {
-		await httpRequest({
-			method: 'DELETE',
-			url: `${BASE}/links/${id}`,
-			headers: { Authorization: `Bearer ${KEY}` },
-		});
-	}
-
 	if (!account) {
-		console.log('--  posts skipped: the key reaches no connected account');
+		// Short links and posts need a connected account (links: or a paid plan).
+		console.log('--  links and posts skipped: the key reaches no connected account');
 	} else {
+		// A short link n8n tries again in the same execution: the same link comes back.
+		const link = {
+			resource: 'link',
+			operation: 'create',
+			url: 'https://rizamo.com/',
+			additionalFields: { utmSource: 'n8n', utmCampaign: 'node-check' },
+		};
+		const [made] = await run('create a short link', link);
+		const [madeAgain] = await run('create it again in the same execution', link);
+		if (process.env.RIZAMO_DEMO !== '1')
+			assert.equal(madeAgain.id, made.id, 'a retry made a second link');
+		await run('get the link', { resource: 'link', operation: 'get', linkId: made.id });
+		for (const id of new Set([made.id, madeAgain.id])) {
+			await httpRequest({
+				method: 'DELETE',
+				url: `${BASE}/links/${id}`,
+				headers: { Authorization: `Bearer ${KEY}` },
+			});
+		}
+
 		const params = {
 			resource: 'post',
 			operation: 'create',
