@@ -3,17 +3,65 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Post new Shopify products\n\nA new product in Shopify becomes a post in your Rizamo queue, with its first photo, its title, a short description and its link.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Connect Shopify in **New product**.\n5. In **Add to queue**, pick the profile and accounts, and replace your-store.com with your store's address.",
-        "width": 440,
-        "height": 520
+        "content": "## Post new Shopify products to Instagram and Facebook\n\n### How it works\nFor shops that announce every new product on social media. When a product is created in Shopify, the workflow checks that it is active and has a photo, so drafts and products still waiting for pictures are skipped.\n\nIt then writes a post with the title, a short description, the lowest price and the product's link, and adds up to four photos (more than one makes a carousel). The post goes to a Rizamo profile's queue, and Rizamo publishes it at the profile's next free posting time on the accounts you pick.\n\nA product created as a draft is not posted when it goes live later: this workflow only reads new products.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Shopify in **New product**.\n4. In **Write the post**, set your shop's address and how prices read.\n5. In **Add to queue**, pick the profile and its accounts. The profile's posting times are set in Rizamo.\n6. Activate the workflow.\n\n### Customization\nChange the caption in **Write the post**, or set **When** to Publish Now to post at once.",
+        "height": 640,
+        "width": 520
       },
-      "id": "4abcc839-ef6c-41ce-acf8-11696b91d181",
+      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
       "name": "About",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -520,
-        -200
+        -620,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Skip drafts and products without photos\nOnly active products with at least one photo go on.",
+        "height": 360,
+        "width": 440,
+        "color": 7
+      },
+      "id": "167d5783-b9ab-5b68-b60c-c3d965d26378",
+      "name": "Section: check",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Write the post\nTitle, description, lowest price and link, with up to 4 photos.",
+        "height": 360,
+        "width": 340,
+        "color": 7
+      },
+      "id": "cbcc80d8-a06d-5949-824a-2cfd18c3d363",
+      "name": "Section: write",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Add it to the queue\nRizamo publishes it at the profile's next free posting time.",
+        "height": 360,
+        "width": 340,
+        "color": 7
+      },
+      "id": "c6590bf8-ba72-590b-8b6d-ce760171f767",
+      "name": "Section: queue",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -160
       ]
     },
     {
@@ -31,30 +79,106 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ba1d4a82-82c2-5d6b-a99b-5669cdf04987",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "active",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "0c935d9e-6acc-5f75-8e89-1face43feb6b",
+              "leftValue": "={{ ($json.images || []).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1f6a6f43-cad9-590b-baea-4253781326eb",
+      "name": "Active with a photo",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Your shop's public address and how prices read.\nconst STORE_URL = 'https://your-store.com';\nconst PRICE = (amount) => `From $${amount}`;\n\n// Builds the caption and the photos from the Shopify product.\nconst product = $json;\nconst description = (product.body_html || '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .replace(/ ([.,!?;:])/g, '$1')\n  .trim();\nconst short = description.length > 220 ? description.slice(0, 220).replace(/\\s+\\S*$/, '') + '...' : description;\nconst prices = (product.variants || []).map((v) => Number(v.price)).filter((n) => !Number.isNaN(n));\nconst price = prices.length ? PRICE(Math.min(...prices).toFixed(2)) : '';\n// Up to 4 photos: more than one makes a carousel.\nconst photos = (product.images || []).map((image) => image.src).filter(Boolean).slice(0, 4);\nreturn {\n  json: {\n    text: [`New in: ${product.title}`, short, price, `${STORE_URL}/products/${product.handle}`].filter(Boolean).join('\\n\\n'),\n    photos: photos.join(','),\n  },\n};"
+      },
+      "id": "fed420d5-1040-5ba2-a77c-03138af27bde",
+      "name": "Write the post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        0
+      ]
+    },
+    {
+      "parameters": {
         "resource": "post",
         "operation": "create",
         "profileId": "",
         "accountIds": [],
-        "text": "=New in: {{ $json.title }}\n\n{{ ($json.body_html || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 220) }}\n\nhttps://your-store.com/products/{{ $json.handle }}",
+        "text": "={{ $json.text }}",
         "when": "queue",
         "mediaSource": "urls",
-        "mediaUrls": "={{ $json.image?.src || ($json.images?.[0]?.src ?? '') }}",
-        "additionalFields": {
-          "alt": "={{ $json.title }}"
-        }
+        "mediaUrls": "={{ $json.photos }}",
+        "additionalFields": {}
       },
       "id": "2f959579-85bb-4555-a61d-db4d0917e609",
       "name": "Add to queue",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
-        260,
+        920,
         0
       ]
     }
   ],
   "connections": {
     "New product": {
+      "main": [
+        [
+          {
+            "node": "Active with a photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Active with a photo": {
+      "main": [
+        [
+          {
+            "node": "Write the post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the post": {
       "main": [
         [
           {
