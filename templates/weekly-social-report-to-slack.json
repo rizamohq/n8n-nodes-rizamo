@@ -4,7 +4,7 @@
     {
       "parameters": {
         "content": "## Send a weekly social media report to Slack\n\n### How it works\nFor marketing teams and agencies that review social results every week. Every Monday at 8:00, the workflow reads Rizamo's analytics for the last 7 days against the 7 before: views, reach and engagements across Instagram, Facebook, TikTok, YouTube and Threads.\n\nIt adds the week's three most viewed posts with their links, writes one message with each number and its change, and sends it to a Slack channel. Without a profile picked, it reports on every account of the team. A number with no week before to compare shows without a change.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. To report on one brand, pick its profile under Options in **Last 7 days** and **Top posts**.\n4. Connect Slack and pick the channel in **Send to Slack**.\n5. Activate the workflow.\n\n### Customization\nChange the day and hour in **Every Monday at 8:00**, the number of top posts in **Top posts**, or the message in **Write the report**. Duplicate the workflow for each client, each with its own profile and channel.",
-        "height": 840,
+        "height": 600,
         "width": 520
       },
       "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
@@ -19,7 +19,7 @@
     {
       "parameters": {
         "content": "## Read the week's results\nThe last 7 days against the 7 before, and the 3 most viewed posts.",
-        "height": 320,
+        "height": 360,
         "width": 660,
         "color": 7
       },
@@ -29,13 +29,13 @@
       "typeVersion": 1,
       "position": [
         -60,
-        -140
+        -160
       ]
     },
     {
       "parameters": {
         "content": "## Write and send the report\nOne Slack message with each number and its change.",
-        "height": 320,
+        "height": 360,
         "width": 440,
         "color": 7
       },
@@ -44,8 +44,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        600,
-        -140
+        640,
+        -160
       ]
     },
     {
@@ -119,7 +119,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        660,
+        700,
         0
       ],
       "executeOnce": true
@@ -140,7 +140,7 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
       "position": [
-        880,
+        920,
         0
       ]
     }

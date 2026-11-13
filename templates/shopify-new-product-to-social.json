@@ -4,7 +4,7 @@
     {
       "parameters": {
         "content": "## Post new Shopify products to Instagram and Facebook\n\n### How it works\nFor shops that announce every new product on social media. When a product is created in Shopify, the workflow checks that it is active and has a photo, so drafts and products still waiting for pictures are skipped.\n\nIt then writes a post with the title, a short description, the lowest price and the product's link, and adds up to four photos (more than one makes a carousel). The post goes to a Rizamo profile's queue, and Rizamo publishes it at the profile's next free posting time on the accounts you pick.\n\nA product created as a draft is not posted when it goes live later: this workflow only reads new products.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Shopify in **New product**.\n4. In **Write the post**, set your shop's address and how prices read.\n5. In **Add to queue**, pick the profile and its accounts. The profile's posting times are set in Rizamo.\n6. Activate the workflow.\n\n### Customization\nChange the caption in **Write the post**, or set **When** to Publish Now to post at once.",
-        "height": 840,
+        "height": 640,
         "width": 520
       },
       "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
@@ -19,8 +19,8 @@
     {
       "parameters": {
         "content": "## Skip drafts and products without photos\nOnly active products with at least one photo go on.",
-        "height": 320,
-        "width": 460,
+        "height": 360,
+        "width": 440,
         "color": 7
       },
       "id": "167d5783-b9ab-5b68-b60c-c3d965d26378",
@@ -29,14 +29,14 @@
       "typeVersion": 1,
       "position": [
         -60,
-        -140
+        -160
       ]
     },
     {
       "parameters": {
         "content": "## Write the post\nTitle, description, lowest price and link, with up to 4 photos.",
-        "height": 320,
-        "width": 220,
+        "height": 360,
+        "width": 340,
         "color": 7
       },
       "id": "cbcc80d8-a06d-5949-824a-2cfd18c3d363",
@@ -45,14 +45,14 @@
       "typeVersion": 1,
       "position": [
         420,
-        -140
+        -160
       ]
     },
     {
       "parameters": {
         "content": "## Add it to the queue\nRizamo publishes it at the profile's next free posting time.",
-        "height": 320,
-        "width": 220,
+        "height": 360,
+        "width": 340,
         "color": 7
       },
       "id": "c6590bf8-ba72-590b-8b6d-ce760171f767",
@@ -60,8 +60,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        680,
-        -140
+        800,
+        -160
       ]
     },
     {
@@ -115,7 +115,7 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        240,
+        220,
         0
       ]
     },
@@ -129,7 +129,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        480,
+        540,
         0
       ]
     },
@@ -150,7 +150,7 @@
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
-        740,
+        920,
         0
       ]
     }
