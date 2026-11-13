@@ -3,17 +3,65 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Share new blog articles from RSS\n\nEvery new article in your feed is added to a Rizamo profile's queue, so it goes out at the next free posting time.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Put your feed's address in **New article**.\n5. In **Add to queue**, pick the profile and accounts.\n\nInstagram and TikTok need an image or video: set Media to File URLs and map your feed's image there.",
-        "width": 440,
-        "height": 560
+        "content": "## Share new blog articles on social media from RSS\n\n### How it works\nFor blogs and newsletters that want each new article on their social accounts without copying it by hand. When the RSS feed has a new article, the workflow reads the article's page to find its cover image (the og:image tag, or else the feed's own image) and writes a post with the title, a short summary and the link.\n\nThe post goes to a Rizamo profile's queue, so Rizamo publishes it at the profile's next free posting time and several articles on one day are spread out. An article with an image goes to every account you pick, Instagram included. One without an image goes only to accounts that take text alone, such as Facebook and Threads. A page that cannot be read still gets a post, from the feed alone.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Put your feed's address in **New article**. It checks the feed every hour.\n4. In **Queue with the image** and **Queue as text**, pick the profile and its accounts. The profile's posting times are set in Rizamo.\n5. Activate the workflow.\n\n### Customization\nEdit **Write the post** to add hashtags or change the summary's length, or set **When** to Publish Now to skip the queue.",
+        "height": 880,
+        "width": 520
       },
-      "id": "21c7f3a0-145d-4e6b-904e-d990639a7782",
+      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
       "name": "About",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -520,
-        -200
+        -620,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Read the new article\nFetch each new article's page to find the image it shares.",
+        "height": 320,
+        "width": 460,
+        "color": 7
+      },
+      "id": "715d5e92-8a61-5c4b-a819-9fb481decb39",
+      "name": "Section: read",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Write the post\nTitle, a 200-character summary and the link, with the page's image when it has one.",
+        "height": 320,
+        "width": 460,
+        "color": 7
+      },
+      "id": "cbcc80d8-a06d-5949-824a-2cfd18c3d363",
+      "name": "Section: write",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Add it to the queue\nWith an image, every account you pick. Without one, text accounts such as Facebook and Threads.",
+        "height": 500,
+        "width": 220,
+        "color": 7
+      },
+      "id": "c6590bf8-ba72-590b-8b6d-ce760171f767",
+      "name": "Section: queue",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        -240
       ]
     },
     {
@@ -38,22 +86,113 @@
     },
     {
       "parameters": {
+        "url": "={{ $json.link }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "166086ef-6d27-5d19-a1ea-d2eaa0147c92",
+      "name": "Read the article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Builds the post from the feed item and the article's page.\nconst article = $('New article').item.json;\nconst html = typeof $json.data === 'string' ? $json.data : '';\n// The image the article shares on social media: its og:image tag, or else the feed's own image.\nconst tag = html.match(/<meta[^>]+property=[\"']og:image[\"'][^>]*>/i);\nconst fromPage = tag ? (tag[0].match(/content=[\"']([^\"']+)[\"']/i) || [])[1] || '' : '';\nconst enclosure = article.enclosure || {};\nconst fromFeed = /^image\\//.test(enclosure.type || '') ? enclosure.url : '';\nconst image = (fromPage || fromFeed || '').replace(/&amp;/g, '&');\nconst snippet = (article.contentSnippet || '').replace(/\\s+/g, ' ').trim();\nconst summary = snippet.length > 200 ? snippet.slice(0, 200).replace(/\\s+\\S*$/, '') + '...' : snippet;\nreturn {\n  json: {\n    text: [article.title, summary, article.link].filter(Boolean).join('\\n\\n'),\n    image: /^https:\\/\\//.test(image) ? image : '',\n  },\n};"
+      },
+      "id": "73f7f339-5fc9-5eb5-8d75-1488e0360bfc",
+      "name": "Write the post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d07e34db-323d-525a-96aa-74b2e8d47b77",
+              "leftValue": "={{ $json.image }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "362fb457-148c-5fb1-b39e-b94b5dd99ec9",
+      "name": "Has an image",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
         "resource": "post",
         "operation": "create",
         "profileId": "",
         "accountIds": [],
-        "text": "={{ $json.title }}\n\n{{ $json.contentSnippet ? $json.contentSnippet.slice(0, 200) + '...\\n\\n' : '' }}{{ $json.link }}",
+        "text": "={{ $json.text }}",
         "when": "queue",
-        "mediaSource": "none",
-        "additionalFields": {}
+        "additionalFields": {},
+        "mediaSource": "urls",
+        "mediaUrls": "={{ $json.image }}"
       },
       "id": "6b7af1ba-0f50-40ba-9cda-5dde88170fda",
-      "name": "Add to queue",
+      "name": "Queue with the image",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
-        260,
-        0
+        980,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "profileId": "",
+        "accountIds": [],
+        "text": "={{ $json.text }}",
+        "when": "queue",
+        "additionalFields": {},
+        "mediaSource": "none"
+      },
+      "id": "bc141e86-5e78-5d70-884b-ad70830411bc",
+      "name": "Queue as text",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        980,
+        100
       ]
     }
   ],
@@ -62,7 +201,47 @@
       "main": [
         [
           {
-            "node": "Add to queue",
+            "node": "Read the article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read the article": {
+      "main": [
+        [
+          {
+            "node": "Write the post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the post": {
+      "main": [
+        [
+          {
+            "node": "Has an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has an image": {
+      "main": [
+        [
+          {
+            "node": "Queue with the image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Queue as text",
             "type": "main",
             "index": 0
           }

@@ -3,16 +3,64 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Schedule clients' posts from a Google Sheet\n\nEach row with Status **Ready** becomes a scheduled post on the client's Rizamo profile. The row is then marked **Scheduled** with the post's ID.\n\n### The sheet\nColumns: **Profile ID** (prof_...), **Account IDs** (acc_..., separated by commas), **Text**, **Media URLs** (public links, separated by commas, may be empty), **Publish at** (e.g. 2026-12-01 09:00, in the profile's time zone), **Status**, **Post ID**.\n\nGet the IDs with the Rizamo node's Get Many on Profile and Account.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Pick your sheet in **Read rows** and **Mark scheduled**.",
-        "width": 480,
-        "height": 680
+        "content": "## Schedule clients' social posts from a Google Sheet\n\n### How it works\nFor agencies that plan clients' posts in a spreadsheet. Every 15 minutes the workflow reads the sheet and takes the rows whose Status is **Ready**. Each one becomes a scheduled post on that client's Rizamo profile, at the row's date and time, with its images or video.\n\nThe row is then marked **Scheduled** with the post's ID. If Rizamo refuses a row (a missing account, a video too long for a network), the row's Status shows the error instead, so it is not tried again until someone fixes it and sets it back to Ready.\n\n### The sheet\nColumns: **Profile ID** (prof_...), **Account IDs** (acc_..., separated by commas), **Text**, **Media URLs** (public links, separated by commas, may be empty), **Publish at** (e.g. 2026-12-01 09:00, in the profile's time zone), **Status**, **Post ID**. The Rizamo node's Get Many on Profile and Account lists the IDs.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Google Sheets and pick your sheet in **Read rows**, **Mark scheduled** and **Mark failed**.\n4. Activate the workflow.\n\n### Customization\nChange the interval in **Every 15 minutes**, or set **When** to Save as Draft for posts a client approves in Rizamo first.",
+        "height": 1000,
+        "width": 520
       },
-      "id": "defbe122-6116-4005-96a9-ca100e7ca01f",
+      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
       "name": "About",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -560,
+        -620,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Read the rows marked Ready\nEvery 15 minutes, only rows whose Status is Ready.",
+        "height": 320,
+        "width": 660,
+        "color": 7
+      },
+      "id": "715d5e92-8a61-5c4b-a819-9fb481decb39",
+      "name": "Section: read",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Schedule each row\nOn the row's profile and accounts, at its date and time.",
+        "height": 320,
+        "width": 220,
+        "color": 7
+      },
+      "id": "a76177bf-2867-5335-83af-96e72b7f76cf",
+      "name": "Section: schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Write back the result\nScheduled with the post's ID, or the error Rizamo gave.",
+        "height": 500,
+        "width": 220,
+        "color": 7
+      },
+      "id": "cbcc80d8-a06d-5949-824a-2cfd18c3d363",
+      "name": "Section: write",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
         -240
       ]
     },
@@ -112,7 +160,8 @@
       "position": [
         660,
         0
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -172,8 +221,61 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        880,
-        0
+        920,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Ready').item.json.row_number }}",
+            "Status": "={{ 'Error: ' + $json.error }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "120bed00-fcbd-50ae-8337-c14b8866c039",
+      "name": "Mark failed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        920,
+        100
       ]
     }
   ],
@@ -216,6 +318,13 @@
         [
           {
             "node": "Mark scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark failed",
             "type": "main",
             "index": 0
           }

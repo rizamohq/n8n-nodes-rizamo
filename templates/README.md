@@ -6,19 +6,19 @@ Workflows for [n8n.io/workflows](https://n8n.io/workflows) that use the Rizamo n
 
 `blog-rss-to-social-queue.json`
 
-Each new article in your blog's RSS feed becomes a post in your Rizamo queue, published at the profile's next free posting time on Facebook, Threads and any other account you choose.
+Each new article in your blog's RSS feed becomes a post in your Rizamo queue, with the image the article shares. Articles with an image go to every account you choose, Instagram included; the others go to text accounts such as Facebook and Threads.
 
 ## Schedule clients' social posts from Google Sheets with Rizamo
 
 `agency-google-sheets-to-scheduled-posts.json`
 
-For agencies: each row of a Google Sheet with Status Ready becomes a scheduled post on that client's Rizamo profile, with its images or video, and the row is marked Scheduled with the post's ID.
+For agencies: each row of a Google Sheet with Status Ready becomes a scheduled post on that client's Rizamo profile, with its images or video. The row is marked Scheduled with the post's ID, or shows the error when Rizamo refuses it.
 
 ## Post new Shopify products to Instagram and Facebook with Rizamo
 
 `shopify-new-product-to-social.json`
 
-When a product is created in Shopify, Rizamo adds a post with its first photo, title and link to your profile's queue for Instagram, Facebook or any account you choose.
+When an active product with a photo is created in Shopify, Rizamo adds a post with up to four photos, its title, lowest price and link to your profile's queue for Instagram, Facebook or any account you choose.
 
 ## Send a weekly social media report to Slack with Rizamo
 

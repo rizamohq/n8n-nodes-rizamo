@@ -9,7 +9,9 @@ The [Rizamo](https://rizamo.com) nodes for [n8n](https://n8n.io): publish and sc
 
 ## Installation
 
-In n8n, open **Settings**, then **Community Nodes**, choose **Install** and enter:
+The node is verified by n8n. On n8n Cloud or self-hosted n8n, open the nodes panel, search **Rizamo**, pick it under **More from the community** and choose **Install**. An owner or admin installs it.
+
+On older self-hosted n8n, open **Settings**, then **Community Nodes**, choose **Install** and enter:
 
 ```text
 @rizamohq/n8n-nodes-rizamo

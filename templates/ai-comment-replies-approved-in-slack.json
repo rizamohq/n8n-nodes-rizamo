@@ -3,16 +3,64 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## AI-drafted comment replies, approved in Slack\n\nA new comment arrives, OpenAI drafts a reply, and Slack asks a person to approve it. Rizamo replies only after an approval.\n\n### Setup\n1. In Rizamo, open **Developers** and create an API key.\n2. In n8n, add a **Rizamo API** credential with it.\n3. Install the node first if needed: Settings, Community Nodes, `@rizamohq/n8n-nodes-rizamo`.\n4. Connect OpenAI in **Draft a reply** and edit its instructions to your brand's voice.\n5. Connect Slack and pick the channel in **Ask for approval**.\n6. Activate the workflow: the trigger creates its webhook in Rizamo (https only, so n8n needs a public address).",
-        "width": 460,
-        "height": 600
+        "content": "## Draft replies to comments with AI and approve them in Slack\n\n### How it works\nFor brands and agencies that answer every comment but want a person to check each reply. When a comment arrives on an Instagram, Facebook, TikTok, YouTube or Threads post, OpenAI drafts a short reply in the comment's language. Spam and comments that need a person, such as complaints, are skipped.\n\nSlack then shows the comment and the draft with **Reply** and **Skip** buttons, and the workflow waits. Rizamo posts the reply under the comment only when someone chooses Reply. A draft cannot be edited from Slack: skip it and answer in Rizamo's inbox instead.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect OpenAI in **Draft a reply** and edit its instructions to your brand's voice.\n4. Connect Slack and pick the channel in **Ask for approval**.\n5. Activate the workflow. **New comment** creates its webhook in Rizamo, which needs an https address: n8n Cloud has one, and a self-hosted n8n needs a public one.\n\n### Customization\nPick profiles in **New comment** to answer one brand only, or change the model and its instructions in **Draft a reply**.",
+        "height": 820,
+        "width": 520
       },
-      "id": "b8ae0767-9090-4d9c-b14a-45aefc837e76",
+      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
       "name": "About",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -560,
+        -620,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Draft a reply\nOpenAI writes a short reply, or SKIP for spam and comments that need a person.",
+        "height": 320,
+        "width": 700,
+        "color": 7
+      },
+      "id": "0aff1369-e498-55ba-85ba-aee06580eea1",
+      "name": "Section: draft",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Ask a person\nSlack shows the comment and the draft, and waits for Reply or Skip.",
+        "height": 320,
+        "width": 460,
+        "color": 7
+      },
+      "id": "b8978729-0a41-5b23-a866-8c4ba23d24ae",
+      "name": "Section: approve",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Reply\nRizamo posts the approved reply under the comment.",
+        "height": 320,
+        "width": 220,
+        "color": 7
+      },
+      "id": "c6836053-45f8-530e-8cab-d7b7b418e142",
+      "name": "Section: reply",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1140,
         -240
       ]
     },
