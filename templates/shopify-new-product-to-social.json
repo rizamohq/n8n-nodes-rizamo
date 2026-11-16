@@ -1,80 +1,93 @@
 {
-  "name": "Post new Shopify products to Instagram and Facebook with Rizamo",
+  "name": "Post Shopify products to Instagram and Facebook with AI captions and tracked links via Rizamo",
   "nodes": [
     {
       "parameters": {
-        "content": "## Post new Shopify products to Instagram and Facebook\n\n### How it works\nFor shops that announce every new product on social media. When a product is created in Shopify, the workflow checks that it is active and has a photo, so drafts and products still waiting for pictures are skipped.\n\nIt then writes a post with the title, a short description, the lowest price and the product's link, and adds up to four photos (more than one makes a carousel). The post goes to a Rizamo profile's queue, and Rizamo publishes it at the profile's next free posting time on the accounts you pick.\n\nA product created as a draft is not posted when it goes live later: this workflow only reads new products.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Shopify in **New product**.\n4. In **Write the post**, set your shop's address and how prices read.\n5. In **Add to queue**, pick the profile and its accounts. The profile's posting times are set in Rizamo.\n6. Activate the workflow.\n\n### Customization\nChange the caption in **Write the post**, or set **When** to Publish Now to post at once.",
-        "height": 640,
-        "width": 520
-      },
-      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
-      "name": "About",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -620,
-        -300
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Skip drafts and products without photos\nOnly active products with at least one photo go on.",
-        "height": 360,
-        "width": 440,
+        "content": "## Only products that just went live\nActive, with a photo, live in the last 24 hours, and each product once, however often it is edited.",
+        "height": 570,
+        "width": 700,
         "color": 7
       },
-      "id": "167d5783-b9ab-5b68-b60c-c3d965d26378",
+      "id": "9ea084ba-cf30-5951-a87d-ccbdfdd9f11f",
       "name": "Section: check",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
         -60,
-        -160
+        -260
       ]
     },
     {
       "parameters": {
-        "content": "## Write the post\nTitle, description, lowest price and link, with up to 4 photos.",
-        "height": 360,
-        "width": 340,
+        "content": "## Write the post\nA short link with UTM tags, so Shopify shows the sales and Rizamo the clicks. OpenAI writes the caption.",
+        "height": 570,
+        "width": 805,
         "color": 7
       },
-      "id": "cbcc80d8-a06d-5949-824a-2cfd18c3d363",
+      "id": "7e5089be-470b-5cb6-8bc2-c8995397b304",
       "name": "Section: write",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        420,
-        -160
+        680,
+        -260
       ]
     },
     {
       "parameters": {
         "content": "## Add it to the queue\nRizamo publishes it at the profile's next free posting time.",
-        "height": 360,
-        "width": 340,
+        "height": 570,
+        "width": 380,
         "color": 7
       },
-      "id": "c6590bf8-ba72-590b-8b6d-ce760171f767",
+      "id": "014e98f2-6baf-5423-a2ba-a29593136ef6",
       "name": "Section: queue",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        800,
-        -160
+        1525,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Post Shopify products to Instagram and Facebook with AI captions\n\n### How it works\nFor shops that announce new products on social media. Most products start as drafts and go live later, so the workflow listens to new and updated products and takes those that are active, have a photo and went live in the last 24 hours. Each product is posted once, however often it is edited afterwards.\n\nRizamo makes a short link to the product with UTM tags, so Shopify's reports show the visits and sales the post brings and Rizamo counts its clicks. OpenAI writes the caption from the product's title and description, and the price and link follow it as they are, so neither is made up. The post, with up to four photos, goes to a Rizamo profile's queue and is published at its next free posting time.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Shopify in **Product created** and **Product updated**.\n4. In **Prepare the product**, set your shop's address and how prices read.\n5. Connect OpenAI in **Write the caption** and describe your shop at the end of its instructions.\n6. In **Add to queue**, pick the profile and its accounts. The profile's posting times are set in Rizamo.\n7. Activate the workflow.\n\n### Customization\nSet When to Save as Draft in **Add to queue** to read each caption in Rizamo before it goes out, or change the UTM tags in **Tracked link**.",
+        "height": 720,
+        "width": 520
+      },
+      "id": "94bd9044-3f6c-5b3b-87c6-31ac4586fa92",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -260
       ]
     },
     {
       "parameters": {
         "topic": "products/create"
       },
-      "id": "f3db2675-694c-4132-9da2-d9b8cf89a408",
-      "name": "New product",
+      "id": "7a888d03-be75-5146-9c27-bde6f65ef89e",
+      "name": "Product created",
       "type": "n8n-nodes-base.shopifyTrigger",
       "typeVersion": 1,
       "position": [
         0,
-        0
+        -110
+      ]
+    },
+    {
+      "parameters": {
+        "topic": "products/update"
+      },
+      "id": "2f2b97e0-2b03-5747-b5a3-ac8d9476e690",
+      "name": "Product updated",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        110
       ]
     },
     {
@@ -88,7 +101,7 @@
           },
           "conditions": [
             {
-              "id": "ba1d4a82-82c2-5d6b-a99b-5669cdf04987",
+              "id": "4011fcf1-4bc8-56b7-b9b9-9e09525f7274",
               "leftValue": "={{ $json.status }}",
               "rightValue": "active",
               "operator": {
@@ -97,12 +110,22 @@
               }
             },
             {
-              "id": "0c935d9e-6acc-5f75-8e89-1face43feb6b",
+              "id": "01236970-fe96-52c0-80fc-564caac16197",
               "leftValue": "={{ ($json.images || []).length }}",
               "rightValue": 0,
               "operator": {
                 "type": "number",
                 "operation": "gt"
+              }
+            },
+            {
+              "id": "9b9d06e5-bf7e-5db1-b51c-ada85bc9e14b",
+              "leftValue": "={{ !!$json.published_at && DateTime.fromISO($json.published_at) >= $now.minus({ hours: 24 }) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
               }
             }
           ],
@@ -110,26 +133,94 @@
         },
         "options": {}
       },
-      "id": "1f6a6f43-cad9-590b-baea-4253781326eb",
-      "name": "Active with a photo",
+      "id": "0531bf5a-7e71-5d9c-9365-c817ee2f77b2",
+      "name": "Just went live",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        220,
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "logic": "removeItemsWithAlreadySeenKeyValues",
+        "dedupeValue": "={{ $json.id }}",
+        "options": {}
+      },
+      "id": "4204f5f1-24a7-562b-9d64-492c41c2d1f8",
+      "name": "Once per product",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        460,
         0
       ]
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Your shop's public address and how prices read.\nconst STORE_URL = 'https://your-store.com';\nconst PRICE = (amount) => `From $${amount}`;\n\n// Builds the caption and the photos from the Shopify product.\nconst product = $json;\nconst description = (product.body_html || '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .replace(/ ([.,!?;:])/g, '$1')\n  .trim();\nconst short = description.length > 220 ? description.slice(0, 220).replace(/\\s+\\S*$/, '') + '...' : description;\nconst prices = (product.variants || []).map((v) => Number(v.price)).filter((n) => !Number.isNaN(n));\nconst price = prices.length ? PRICE(Math.min(...prices).toFixed(2)) : '';\n// Up to 4 photos: more than one makes a carousel.\nconst photos = (product.images || []).map((image) => image.src).filter(Boolean).slice(0, 4);\nreturn {\n  json: {\n    text: [`New in: ${product.title}`, short, price, `${STORE_URL}/products/${product.handle}`].filter(Boolean).join('\\n\\n'),\n    photos: photos.join(','),\n  },\n};"
+        "jsCode": "// Your shop's public address and how prices read.\nconst STORE_URL = 'https://your-store.com';\nconst PRICE = (amount) => `From $${amount}`;\n\n// The product's facts for the caption, its page and up to 4 photos (more than one makes a carousel).\nconst product = $json;\nconst description = (product.body_html || '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&amp;/g, '&')\n  .replace(/\\s+/g, ' ')\n  .replace(/ ([.,!?;:])/g, '$1')\n  .trim()\n  .slice(0, 1500);\nconst prices = (product.variants || []).map((v) => Number(v.price)).filter((n) => !Number.isNaN(n));\nreturn {\n  json: {\n    title: product.title,\n    handle: product.handle,\n    type: product.product_type || '',\n    description,\n    price: prices.length ? PRICE(Math.min(...prices).toFixed(2)) : '',\n    url: `${STORE_URL}/products/${product.handle}`,\n    photos: (product.images || []).map((image) => image.src).filter(Boolean).slice(0, 4).join(','),\n  },\n};"
       },
-      "id": "fed420d5-1040-5ba2-a77c-03138af27bde",
-      "name": "Write the post",
+      "id": "b48eed3f-a860-565b-a64d-6b38e1eaa966",
+      "name": "Prepare the product",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        540,
+        740,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "link",
+        "operation": "create",
+        "url": "={{ $json.url }}",
+        "additionalFields": {
+          "utmSource": "rizamo",
+          "utmMedium": "social",
+          "utmCampaign": "new-products",
+          "utmContent": "={{ $json.handle }}"
+        }
+      },
+      "id": "da8238bb-e24a-5557-9d9f-db40b7f02a39",
+      "name": "Tracked link",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You write social media captions for an online shop's new products. Write a first line that makes people stop scrolling, then one or two sentences on what the product is and who it is for. At most 400 characters and three hashtags. Use only facts from the product. Do not add the price or a link: they are added after your text.\n\nAbout the shop: describe what it sells, who buys it and its tone."
+            },
+            {
+              "content": "=Product: {{ $('Prepare the product').item.json.title }}\nType: {{ $('Prepare the product').item.json.type }}\nDescription: {{ $('Prepare the product').item.json.description }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "ac445cbc-f4eb-5ee9-9728-ed612262f934",
+      "name": "Write the caption",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1180,
         0
       ]
     },
@@ -139,46 +230,90 @@
         "operation": "create",
         "profileId": "",
         "accountIds": [],
-        "text": "={{ $json.text }}",
+        "text": "={{ $json.message.content.trim() }}\n\n{{ $('Prepare the product').item.json.price }}\n{{ $('Tracked link').item.json.shortUrl }}",
         "when": "queue",
         "mediaSource": "urls",
-        "mediaUrls": "={{ $json.photos }}",
+        "mediaUrls": "={{ $('Prepare the product').item.json.photos }}",
         "additionalFields": {}
       },
-      "id": "2f959579-85bb-4555-a61d-db4d0917e609",
+      "id": "1649f35b-db3e-5739-a472-16d985253979",
       "name": "Add to queue",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
-        920,
+        1585,
         0
       ]
     }
   ],
   "connections": {
-    "New product": {
+    "Product created": {
       "main": [
         [
           {
-            "node": "Active with a photo",
+            "node": "Just went live",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Active with a photo": {
+    "Product updated": {
       "main": [
         [
           {
-            "node": "Write the post",
+            "node": "Just went live",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Write the post": {
+    "Just went live": {
+      "main": [
+        [
+          {
+            "node": "Once per product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Once per product": {
+      "main": [
+        [
+          {
+            "node": "Prepare the product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare the product": {
+      "main": [
+        [
+          {
+            "node": "Tracked link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tracked link": {
+      "main": [
+        [
+          {
+            "node": "Write the caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the caption": {
       "main": [
         [
           {
@@ -192,5 +327,6 @@
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "pinData": {}
 }

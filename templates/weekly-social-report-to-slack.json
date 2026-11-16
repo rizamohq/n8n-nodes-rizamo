@@ -1,51 +1,67 @@
 {
-  "name": "Send a weekly social media report to Slack with Rizamo",
+  "name": "Send each client's weekly social media report to Slack with an AI summary using Rizamo",
   "nodes": [
     {
       "parameters": {
-        "content": "## Send a weekly social media report to Slack\n\n### How it works\nFor marketing teams and agencies that review social results every week. Every Monday at 8:00, the workflow reads Rizamo's analytics for the last 7 days against the 7 before: views, reach and engagements across Instagram, Facebook, TikTok, YouTube and Threads.\n\nIt adds the week's three most viewed posts with their links, writes one message with each number and its change, and sends it to a Slack channel. Without a profile picked, it reports on every account of the team. A number with no week before to compare shows without a change.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. To report on one brand, pick its profile under Options in **Last 7 days** and **Top posts**.\n4. Connect Slack and pick the channel in **Send to Slack**.\n5. Activate the workflow.\n\n### Customization\nChange the day and hour in **Every Monday at 8:00**, the number of top posts in **Top posts**, or the message in **Write the report**. Duplicate the workflow for each client, each with its own profile and channel.",
-        "height": 600,
-        "width": 520
-      },
-      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
-      "name": "About",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -620,
-        -300
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Read the week's results\nThe last 7 days against the 7 before, and the 3 most viewed posts.",
-        "height": 360,
-        "width": 660,
+        "content": "## Read each client's week\nEach Rizamo profile is a client: its last 7 days against the 7 before. Profiles with no views or posts are skipped.",
+        "height": 400,
+        "width": 900,
         "color": 7
       },
-      "id": "715d5e92-8a61-5c4b-a819-9fb481decb39",
+      "id": "63c0fb96-5192-5361-a1a7-0518ca609748",
       "name": "Section: read",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
         -60,
-        -160
+        -150
       ]
     },
     {
       "parameters": {
-        "content": "## Write and send the report\nOne Slack message with each number and its change.",
-        "height": 360,
-        "width": 440,
+        "content": "## Write the report\nOpenAI says what changed most. The numbers, each network and the top posts follow.",
+        "height": 400,
+        "width": 585,
         "color": 7
       },
-      "id": "405981c8-62d7-57b0-93c9-05d803483816",
+      "id": "bab9ef0b-0000-5bbb-8114-98e093859969",
+      "name": "Section: write",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -150
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Send it\nOne Slack message per client.",
+        "height": 400,
+        "width": 380,
+        "color": 7
+      },
+      "id": "3ac2637c-4c41-55a0-b867-e2e6afb261dd",
       "name": "Section: send",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        640,
-        -160
+        1505,
+        -150
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Send each client's weekly social media report to Slack\n\n### How it works\nFor agencies and marketing teams that review social results every week. Every Monday at 8:00, the workflow reads each Rizamo profile's last 7 days against the 7 before: views, reach, engagements, posts and followers, each network's share and the three most viewed posts, across Instagram, Facebook, TikTok, YouTube and Threads.\n\nOpenAI writes two sentences on what changed most and which network or post drove it, using only those numbers. One Slack message per client follows, with that summary first, ready to pass on in a client update. Profiles with no views or posts in the week are skipped.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect OpenAI in **Write the summary**.\n4. Connect Slack and pick the channel in **Send to Slack**.\n5. Activate the workflow.\n\n### Customization\nChange the day and hour in **Every Monday at 8:00**. To send each client's report to its own channel, set the channel in **Send to Slack** by ID with an expression on the profile's name. To report on some clients only, add a filter after **Get clients**.",
+        "height": 640,
+        "width": 520
+      },
+      "id": "da4d1980-7910-5855-a468-ced5f610bc9c",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -150
       ]
     },
     {
@@ -62,7 +78,7 @@
           ]
         }
       },
-      "id": "de3b2bed-c661-42ab-b98d-0da43a998f8d",
+      "id": "e5c9b43a-68c6-554b-be69-85d46c5709ff",
       "name": "Every Monday at 8:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
@@ -73,14 +89,11 @@
     },
     {
       "parameters": {
-        "resource": "analytics",
-        "operation": "getOverview",
-        "period": "days",
-        "days": 7,
-        "options": {}
+        "resource": "profile",
+        "operation": "getAll"
       },
-      "id": "4bd54550-3649-4c09-835c-0146b7f323ae",
-      "name": "Last 7 days",
+      "id": "dcf74889-f6ad-54c2-8880-82fc23f4da6e",
+      "name": "Get clients",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
@@ -91,38 +104,99 @@
     {
       "parameters": {
         "resource": "analytics",
-        "operation": "getPostPerformance",
+        "operation": "getOverview",
         "period": "days",
         "days": 7,
-        "returnAll": false,
-        "limit": 3,
         "options": {
-          "sort": "views"
+          "profileId": "={{ $json.id }}"
         }
       },
-      "id": "7e4057ae-f966-47fa-8f94-144966bd07d6",
-      "name": "Top posts",
+      "id": "2c4b2449-9135-5861-aa68-4e11e2d11110",
+      "name": "Last 7 days",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
         440,
         0
-      ],
-      "executeOnce": true
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Builds the Slack message from Rizamo's overview and the week's top posts.\nconst o = $('Last 7 days').first().json;\nconst posts = $('Top posts').all().map((i) => i.json);\nconst n = (v) => (typeof v === 'number' ? Math.round(v).toLocaleString('en-US') : '-');\nconst change = (k) => {\n  const x = o.kpis?.[k];\n  if (!x || typeof x.previous !== 'number' || x.previous === 0) return '';\n  const pct = Math.round(((x.value - x.previous) / x.previous) * 100);\n  return ` (${pct >= 0 ? '+' : ''}${pct}%)`;\n};\nconst lines = [\n  `*Social this week* (${o.from} to ${o.to})`,\n  `Views: ${n(o.kpis?.views?.value)}${change('views')}`,\n  `Reach: ${n(o.kpis?.reach?.value)}${change('reach')}`,\n  `Engagements: ${n(o.kpis?.engagements?.value)}${change('engagements')}`,\n  '',\n  '*Top posts*',\n  ...posts.map((p, i) => `${i + 1}. ${(p.caption || 'Untitled').split('\\n')[0].slice(0, 80)} (${n(p.views)} views)${p.url ? ' ' + p.url : ''}`),\n];\nreturn [{ json: { text: lines.join('\\n') } }];"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d6a884c4-cede-5eed-be6d-0298be56fdce",
+              "leftValue": "={{ ($json.kpis.views?.value ?? 0) + ($json.kpis.posts?.value ?? 0) }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "2fbdd264-b5fb-4e72-b6f4-90526a9d77c9",
+      "id": "01c6c550-c6fc-5796-aec3-bb90841e1744",
+      "name": "Had a week",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You write the opening of a client's weekly social media report. In at most two sentences, say what changed most against the week before and which network or post drove it, with the numbers. Use only the data given. No advice unless a number shows it, no emoji, plain text."
+            },
+            {
+              "content": "={{ JSON.stringify({ client: $('Get clients').item.json.name, from: $json.from, to: $json.to, kpis: $json.kpis, byNetwork: $json.byNetwork, topPosts: ($json.topPosts || []).slice(0, 3).map((p) => ({ network: p.network, format: p.format, views: p.views, engagements: p.engagements, caption: (p.caption || '').slice(0, 80) })) }) }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "a97ee8d9-a243-5dff-b757-2c4393945a2a",
+      "name": "Write the summary",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        940,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// One Slack message per client: the summary, each number against last week, each network and the top posts.\nconst o = $('Had a week').item.json;\nconst k = o.kpis || {};\nconst name = (n) => ({ instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', threads: 'Threads', youtube: 'YouTube', linkedin: 'LinkedIn' })[n] ?? n;\nconst n = (v) => (typeof v === 'number' ? Math.round(v).toLocaleString('en-US') : '-');\nconst change = (x) => {\n  if (!x || typeof x.previous !== 'number' || x.previous === 0) return '';\n  const pct = Math.round(((x.value - x.previous) / x.previous) * 100);\n  return ` (${pct >= 0 ? '+' : ''}${pct}%)`;\n};\nconst f = k.followers;\nconst count = (v, one, many) => `${n(v)} ${v === 1 ? one : many}`;\nconst network = (x) => [`${n(x.views)} views`, typeof x.engagements === 'number' ? count(x.engagements, 'engagement', 'engagements') : null,\n  typeof x.posts === 'number' ? count(x.posts, 'post', 'posts') : null].filter(Boolean).join(', ');\nconst lines = [\n  `*${$('Get clients').item.json.name}*, ${o.from} to ${o.to}`,\n  $json.message.content.trim(),\n  '',\n  `Views: ${n(k.views?.value)}${change(k.views)}`,\n  `Reach: ${n(k.reach?.value)}${change(k.reach)}`,\n  `Engagements: ${n(k.engagements?.value)}${change(k.engagements)}`,\n  `Posts: ${n(k.posts?.value)}${change(k.posts)}`,\n  ...(f ? [`Followers: ${n(f.value)} (${f.change >= 0 ? '+' : ''}${n(f.change)} this week)`] : []),\n  '',\n  '*By network*',\n  ...(o.byNetwork || []).map((x) => `${name(x.network)}: ${network(x)}`),\n  '',\n  '*Top posts*',\n  ...(o.topPosts || []).slice(0, 3).map((p, i) =>\n    `${i + 1}. ${(p.caption || 'Untitled').split('\\n')[0].slice(0, 80)} (${name(p.network)}, ${n(p.views)} views)${p.url ? ' ' + p.url : ''}`),\n];\nreturn { json: { text: lines.join('\\n') } };"
+      },
+      "id": "2f362a1a-f007-50ac-a3d4-83c42f99fcbc",
       "name": "Write the report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        700,
+        1285,
         0
-      ],
-      "executeOnce": true
+      ]
     },
     {
       "parameters": {
@@ -135,18 +209,29 @@
         "text": "={{ $json.text }}",
         "otherOptions": {}
       },
-      "id": "8f6452e4-35cc-46f0-8af4-b6177c12081f",
+      "id": "177a7477-0ae9-5f7f-82bb-1a73b97c34a6",
       "name": "Send to Slack",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
       "position": [
-        920,
+        1565,
         0
       ]
     }
   ],
   "connections": {
     "Every Monday at 8:00": {
+      "main": [
+        [
+          {
+            "node": "Get clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get clients": {
       "main": [
         [
           {
@@ -161,14 +246,25 @@
       "main": [
         [
           {
-            "node": "Top posts",
+            "node": "Had a week",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Top posts": {
+    "Had a week": {
+      "main": [
+        [
+          {
+            "node": "Write the summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the summary": {
       "main": [
         [
           {
@@ -193,5 +289,6 @@
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "pinData": {}
 }
