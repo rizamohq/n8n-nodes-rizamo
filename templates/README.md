@@ -10,34 +10,34 @@ Workflows for [n8n.io/workflows](https://n8n.io/workflows) that use the Rizamo n
 
 Each new article in your blog's RSS feed becomes a post in your Rizamo queue, with the image the article shares. Articles with an image go to every account you choose, Instagram included; the others go to text accounts such as Facebook and Threads.
 
-## Schedule clients' social posts from Google Sheets with Rizamo
+## Schedule clients' social posts from Google Sheets and track what went live with Rizamo
 
 `agency-google-sheets-to-scheduled-posts.json`
 
 ![The workflow in n8n](images/agency-sheets.png)
 
-For agencies: each row of a Google Sheet with Status Ready becomes a scheduled post on that client's Rizamo profile, with its images or video. The row is marked Scheduled with the post's ID, or shows the error when Rizamo refuses it.
+For agencies: each row of a Google Sheet with Status Ready becomes a scheduled post on the client's Rizamo profile, found by its name, on the networks the row names, with its images or video. When every network is done, the row shows Published with each network's link, or what failed and why, and a failure goes to Slack.
 
-## Post new Shopify products to Instagram and Facebook with Rizamo
+## Post Shopify products to Instagram and Facebook with AI captions and tracked links via Rizamo
 
 `shopify-new-product-to-social.json`
 
 ![The workflow in n8n](images/shopify.png)
 
-When an active product with a photo is created in Shopify, Rizamo adds a post with up to four photos, its title, lowest price and link to your profile's queue for Instagram, Facebook or any account you choose.
+When a Shopify product goes live, whether it was created active or published later from a draft, Rizamo adds a post with up to four photos to your profile's queue, once per product. OpenAI writes the caption, and the price and a Rizamo short link with UTM tags follow it, so Shopify shows the sales the post brings.
 
-## Send a weekly social media report to Slack with Rizamo
+## Send each client's weekly social media report to Slack with an AI summary using Rizamo
 
 `weekly-social-report-to-slack.json`
 
 ![The workflow in n8n](images/weekly-report.png)
 
-Every Monday at 8:00, Rizamo's views, reach and engagements for the last 7 days, against the 7 before, and the week's top three posts go to a Slack channel.
+Every Monday at 8:00, one Slack message per Rizamo profile: two sentences from OpenAI on what changed most, then views, reach, engagements, posts and followers against the week before, each network's numbers and the week's top three posts.
 
-## Draft replies to social media comments with AI and approve them in Slack with Rizamo
+## Triage social media comments with AI, hide spam and approve replies in Slack with Rizamo
 
 `ai-comment-replies-approved-in-slack.json`
 
 ![The workflow in n8n](images/ai-comment-replies.png)
 
-Each new comment on your Instagram, Facebook, TikTok, YouTube or Threads posts gets a reply drafted by OpenAI. It goes to Slack with Approve and Reject buttons, and Rizamo posts the reply only when someone approves.
+Each new comment on Instagram, Facebook, TikTok, YouTube or Threads is read with its thread and sorted by OpenAI. Replies are drafted and posted only after someone chooses Reply in Slack, spam is hidden, complaints go to Slack, and what is handled is marked done in Rizamo's inbox.

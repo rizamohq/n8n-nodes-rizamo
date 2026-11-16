@@ -55,7 +55,7 @@ The trigger offers every Rizamo event, such as `post.published`, `post.failed`, 
 
 ## Templates
 
-Five workflows to import, each with a sticky note on setup: blog RSS to the queue, clients' posts from Google Sheets, new Shopify products, a weekly report to Slack, and AI-drafted comment replies approved in Slack. See [templates](templates/).
+Five workflows to import, each with a sticky note on setup: blog RSS to the queue, clients' posts from Google Sheets with what went live written back, Shopify products as they go live, each client's weekly report to Slack, and comments sorted by AI with replies approved in Slack. See [templates](templates/).
 
 ## Compatibility
 

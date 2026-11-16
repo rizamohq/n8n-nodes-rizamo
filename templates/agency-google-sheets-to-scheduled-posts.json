@@ -1,67 +1,115 @@
 {
-  "name": "Schedule clients' social posts from Google Sheets with Rizamo",
+  "name": "Schedule clients' social posts from Google Sheets and track what went live with Rizamo",
   "nodes": [
     {
       "parameters": {
-        "content": "## Schedule clients' social posts from a Google Sheet\n\n### How it works\nFor agencies that plan clients' posts in a spreadsheet. Every 15 minutes the workflow reads the sheet and takes the rows whose Status is **Ready**. Each one becomes a scheduled post on that client's Rizamo profile, at the row's date and time, with its images or video.\n\nThe row is then marked **Scheduled** with the post's ID. If Rizamo refuses a row (a missing account, a video too long for a network), the row's Status shows the error instead, so it is not tried again until someone fixes it and sets it back to Ready.\n\n### The sheet\nColumns: **Profile ID** (prof_...), **Account IDs** (acc_..., separated by commas), **Text**, **Media URLs** (public links, separated by commas, may be empty), **Publish at** (e.g. 2026-12-01 09:00, in the profile's time zone), **Status**, **Post ID**. The Rizamo node's Get Many on Profile and Account lists the IDs.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Google Sheets and pick your sheet in **Read rows**, **Mark scheduled** and **Mark failed**.\n4. Activate the workflow.\n\n### Customization\nChange the interval in **Every 15 minutes**, or set **When** to Save as Draft for posts a client approves in Rizamo first.",
-        "height": 700,
-        "width": 520
-      },
-      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
-      "name": "About",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -620,
-        -300
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Read the rows marked Ready\nEvery 15 minutes, only rows whose Status is Ready.",
-        "height": 540,
-        "width": 660,
+        "content": "## Read the rows marked Ready\nEvery 15 minutes, only the rows whose Status is Ready.",
+        "height": 640,
+        "width": 680,
         "color": 7
       },
-      "id": "715d5e92-8a61-5c4b-a819-9fb481decb39",
+      "id": "28135147-8d7a-51d7-b6e2-d2638127b435",
       "name": "Section: read",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
         -60,
-        -260
+        -280
       ]
     },
     {
       "parameters": {
-        "content": "## Schedule each row\nOn the row's profile and accounts, at its date and time.",
-        "height": 540,
-        "width": 340,
+        "content": "## Find the client in Rizamo\nClient names a Rizamo profile and Networks picks its accounts. Empty Networks means all of them.",
+        "height": 640,
+        "width": 900,
         "color": 7
       },
-      "id": "a76177bf-2867-5335-83af-96e72b7f76cf",
+      "id": "5286e852-d704-5643-a4e3-52d465866ac5",
+      "name": "Section: match",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Schedule and write back\nScheduled with the post's ID, or the reason it could not be.",
+        "height": 640,
+        "width": 480,
+        "color": 7
+      },
+      "id": "5823b0ac-5aef-5f5e-b975-69d3734eb327",
       "name": "Section: schedule",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        640,
-        -260
+        1600,
+        -280
       ]
     },
     {
       "parameters": {
-        "content": "## Write back the result\nScheduled with the post's ID, or the error Rizamo gave.",
-        "height": 540,
-        "width": 340,
+        "content": "## When every network is done\nRizamo sends the result. Posts that are not in the sheet stop at Find the row.",
+        "height": 350,
+        "width": 460,
         "color": 7
       },
-      "id": "cbcc80d8-a06d-5949-824a-2cfd18c3d363",
+      "id": "31f5d707-f912-5054-bd82-7928edff297a",
+      "name": "Section: result",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        570
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Write the result\nPublished, partly published or failed, with each network's link or reason.",
+        "height": 350,
+        "width": 460,
+        "color": 7
+      },
+      "id": "6760b266-f732-5dbb-a7f5-d13306fa511a",
       "name": "Section: write",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
+        480,
+        570
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Tell the account manager\nA failure goes to Slack with the client, the post and why.",
+        "height": 350,
+        "width": 460,
+        "color": 7
+      },
+      "id": "0df0eb62-6be0-57e7-8851-f6b64573a076",
+      "name": "Section: alert",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
         1020,
-        -260
+        570
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Schedule clients' social posts from Google Sheets and track what went live\n\n### How it works\nFor agencies that plan clients' posts in a shared sheet. Every 15 minutes the workflow reads the rows whose Status is **Ready**, finds the client's profile in Rizamo by name and its accounts by network, and schedules the post at the row's date and time with its images or video. The row turns **Scheduled**, with the post's ID, or shows why it could not be scheduled.\n\nWhen every network of a post is done, Rizamo starts the second part, which writes **Published** and each network's link in the row, or what failed and why. A failure also goes to Slack, to fix before the client sees it.\n\n### The sheet\nColumns: **Client** (the profile's name in Rizamo), **Networks** (such as Instagram, Facebook; empty for every account), **Text**, **Media URLs** (public links separated by commas, may be empty), **Publish at** (such as 2026-12-01 09:00, in the profile's time zone), **Status**, **Post ID** and **Links**.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect Google Sheets and pick your sheet in **Read rows**, **Mark scheduled**, **Mark failed**, **Find the row** and **Update the row**.\n4. Connect Slack and pick a channel in **Alert the account manager**.\n5. Activate the workflow. **Post published or failed** creates its webhook in Rizamo, which needs an https address: n8n Cloud has one, and a self-hosted n8n needs a public one.\n\n### Customization\nChange the interval in **Every 15 minutes**, or set When to Save as Draft in **Schedule post** for posts a client approves in Rizamo first.",
+        "height": 760,
+        "width": 520
+      },
+      "id": "027e9213-3c4d-5966-bfe2-f2c8ec3ac147",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -280
       ]
     },
     {
@@ -75,7 +123,7 @@
           ]
         }
       },
-      "id": "3c8ebc3b-59fa-439b-bbf7-a17f2d59fa02",
+      "id": "8f1bab74-d7d8-52b4-aa8e-fad66fe4e225",
       "name": "Every 15 minutes",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
@@ -98,7 +146,7 @@
         },
         "options": {}
       },
-      "id": "c547be72-77fd-43b6-a12b-a110f468dad7",
+      "id": "f7625989-5f51-575a-9419-5846c6342e8b",
       "name": "Read rows",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
@@ -118,7 +166,7 @@
           },
           "conditions": [
             {
-              "id": "00f20ddd-ac12-4914-851c-c6bdd29e8cb1",
+              "id": "c3012964-fb21-5af5-96ee-fde83f7f0817",
               "leftValue": "={{ $json.Status }}",
               "rightValue": "Ready",
               "operator": {
@@ -131,7 +179,7 @@
         },
         "options": {}
       },
-      "id": "913ff730-d823-459b-ae90-e030b2389198",
+      "id": "892117f7-6712-5162-aea3-28c527c30be2",
       "name": "Ready",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
@@ -142,30 +190,108 @@
     },
     {
       "parameters": {
+        "resource": "profile",
+        "operation": "getAll"
+      },
+      "id": "cdb2b250-346a-5401-8715-53da228035d2",
+      "name": "Get clients",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        720,
+        0
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "account",
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {}
+      },
+      "id": "a0fefff7-6176-5376-83ca-f0040bca508e",
+      "name": "Get accounts",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        940,
+        0
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Finds each row's Rizamo profile by the client's name, and its accounts by the networks named.\nconst profiles = $('Get clients').all().map((i) => i.json);\nconst accounts = $('Get accounts').all().map((i) => i.json);\nconst clean = (s) => String(s ?? '').trim().toLowerCase();\n\nreturn $('Ready').all().map((row) => {\n  const r = row.json;\n  const profile = profiles.find((p) => clean(p.name) === clean(r.Client));\n  const wanted = String(r.Networks ?? '').split(',').map((s) => s.trim()).filter(Boolean);\n  const theirs = profile ? accounts.filter((a) => a.profileId === profile.id) : [];\n  const picked = wanted.length ? theirs.filter((a) => wanted.some((n) => clean(n) === a.network)) : theirs;\n  const missing = wanted.filter((n) => !theirs.some((a) => a.network === clean(n)));\n  let problem = '';\n  if (!profile) problem = `no Rizamo profile is named \"${r.Client}\"`;\n  else if (missing.length) problem = `${profile.name} has no ${missing.join(', ')} account in Rizamo`;\n  else if (!picked.length) problem = `${profile.name} has no accounts in Rizamo`;\n  return {\n    json: {\n      row_number: r.row_number,\n      profileId: profile?.id ?? '',\n      accountIds: picked.map((a) => a.id),\n      text: r.Text ?? '',\n      mediaUrls: r['Media URLs'] ?? '',\n      publishAt: String(r['Publish at'] ?? '').trim().replace(' ', 'T'),\n      problem,\n    },\n  };\n});"
+      },
+      "id": "ef82eea8-365a-589e-b37b-944601ed1d6b",
+      "name": "Match client and networks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c96ec746-ddef-58e5-841d-856ee0124c4f",
+              "leftValue": "={{ $json.problem }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e0df58cd-21b1-5d85-ae10-62d2ed268c31",
+      "name": "Found",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1380,
+        0
+      ]
+    },
+    {
+      "parameters": {
         "resource": "post",
         "operation": "create",
-        "profileId": "={{ $json['Profile ID'] }}",
-        "accountIds": "={{ String($json['Account IDs']).split(',').map(s => s.trim()).filter(Boolean) }}",
-        "text": "={{ $json.Text }}",
+        "profileId": "={{ $json.profileId }}",
+        "accountIds": "={{ $json.accountIds }}",
+        "text": "={{ $json.text }}",
         "when": "schedule",
-        "scheduledAt": "={{ String($json['Publish at']).trim().replace(' ', 'T') }}",
+        "scheduledAt": "={{ $json.publishAt }}",
         "mediaSource": "urls",
-        "mediaUrls": "={{ $json['Media URLs'] || '' }}",
+        "mediaUrls": "={{ $json.mediaUrls }}",
         "additionalFields": {}
       },
-      "id": "35afe47f-b351-4e85-96ef-540c37d8c955",
+      "id": "b10b3674-33eb-5528-bee0-b9626152611c",
       "name": "Schedule post",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
-        760,
-        0
+        1660,
+        -100
       ],
       "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "operation": "update",
         "documentId": {
           "__rl": true,
           "mode": "list",
@@ -176,10 +302,11 @@
           "mode": "list",
           "value": ""
         },
+        "operation": "update",
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "row_number": "={{ $('Ready').item.json.row_number }}",
+            "row_number": "={{ $('Match client and networks').item.json.row_number }}",
             "Status": "Scheduled",
             "Post ID": "={{ $json.id }}"
           },
@@ -193,8 +320,8 @@
               "type": "string",
               "canBeUsedToMatch": true,
               "display": true,
-              "readOnly": true,
-              "removed": false
+              "removed": false,
+              "readOnly": true
             },
             {
               "id": "Status",
@@ -216,18 +343,17 @@
         },
         "options": {}
       },
-      "id": "34404c78-8b4f-4126-881a-b4e2887a8310",
+      "id": "c4dff8e2-e25e-536b-9f70-0ec0b872ce0b",
       "name": "Mark scheduled",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        1140,
-        -110
+        1900,
+        -170
       ]
     },
     {
       "parameters": {
-        "operation": "update",
         "documentId": {
           "__rl": true,
           "mode": "list",
@@ -238,11 +364,12 @@
           "mode": "list",
           "value": ""
         },
+        "operation": "update",
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "row_number": "={{ $('Ready').item.json.row_number }}",
-            "Status": "={{ 'Error: ' + $json.error }}"
+            "row_number": "={{ $('Match client and networks').item.json.row_number }}",
+            "Status": "={{ 'Error: ' + ($json.problem || $json.error) }}"
           },
           "matchingColumns": [
             "row_number"
@@ -254,8 +381,8 @@
               "type": "string",
               "canBeUsedToMatch": true,
               "display": true,
-              "readOnly": true,
-              "removed": false
+              "removed": false,
+              "readOnly": true
             },
             {
               "id": "Status",
@@ -269,13 +396,191 @@
         },
         "options": {}
       },
-      "id": "120bed00-fcbd-50ae-8337-c14b8866c039",
+      "id": "793c8ed9-e94b-5077-9fec-e101101371f2",
       "name": "Mark failed",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        1140,
-        110
+        1900,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "events": [
+          "post.published",
+          "post.failed"
+        ],
+        "profileIds": []
+      },
+      "id": "cfb818ca-17eb-513a-ac31-7d769859c59a",
+      "name": "Post published or failed",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamoTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Post ID",
+              "lookupValue": "={{ $json.resource.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "93a6d881-e16e-5387-a6c5-32e49ed5e46b",
+      "name": "Find the row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Turns Rizamo's result into the row's Status and Links.\nconst event = $('Post published or failed').item.json;\nconst name = (n) => ({ instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', threads: 'Threads', youtube: 'YouTube', linkedin: 'LinkedIn' })[n] ?? n;\nconst live = event.data.published ?? [];\nconst failed = event.data.failed ?? [];\nconst why = (t) => t.status === 'unknown'\n  ? 'it may have gone out, check the network before publishing again'\n  : (typeof t.error === 'string' ? t.error : t.error?.message) || 'no reason given';\nconst problems = failed.map((t) => `${name(t.network)}: ${why(t)}`).join('; ');\nreturn {\n  json: {\n    row_number: $json.row_number,\n    Status: failed.length ? `${live.length ? 'Partly published' : 'Failed'}. ${problems}` : 'Published',\n    Links: live.map((t) => `${name(t.network)}: ${t.url}`).join('\\n'),\n    failed: failed.length > 0,\n    client: $json.Client,\n    summary: event.summary,\n  },\n};"
+      },
+      "id": "c9a7b124-5b82-58ed-9ed4-063e16ab51d4",
+      "name": "Write the result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "operation": "update",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "Status": "={{ $json.Status }}",
+            "Links": "={{ $json.Links }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "readOnly": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false
+            },
+            {
+              "id": "Links",
+              "displayName": "Links",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8bfd123d-c6d7-554e-87c3-3f88675e4e5f",
+      "name": "Update the row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        760,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "40528fe6-4307-5714-9f82-22e9ea933dc1",
+              "leftValue": "={{ $('Write the result').item.json.failed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3e1229b5-8a62-5df9-8d52-768522a5209e",
+      "name": "Any failed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1080,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "text": "={{ $('Write the result').item.json.client }}: {{ $('Write the result').item.json.summary }}\n{{ $('Write the result').item.json.Status }}\nRow {{ $('Write the result').item.json.row_number }} of the calendar.",
+        "otherOptions": {}
+      },
+      "id": "bd6ac402-f12b-5416-abf8-ff51031fa0aa",
+      "name": "Alert the account manager",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1300,
+        720
       ]
     }
   ],
@@ -306,7 +611,58 @@
       "main": [
         [
           {
+            "node": "Get clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get clients": {
+      "main": [
+        [
+          {
+            "node": "Get accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get accounts": {
+      "main": [
+        [
+          {
+            "node": "Match client and networks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match client and networks": {
+      "main": [
+        [
+          {
+            "node": "Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Found": {
+      "main": [
+        [
+          {
             "node": "Schedule post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark failed",
             "type": "main",
             "index": 0
           }
@@ -330,9 +686,65 @@
           }
         ]
       ]
+    },
+    "Post published or failed": {
+      "main": [
+        [
+          {
+            "node": "Find the row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find the row": {
+      "main": [
+        [
+          {
+            "node": "Write the result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the result": {
+      "main": [
+        [
+          {
+            "node": "Update the row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the row": {
+      "main": [
+        [
+          {
+            "node": "Any failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any failed": {
+      "main": [
+        [
+          {
+            "node": "Alert the account manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "pinData": {}
 }

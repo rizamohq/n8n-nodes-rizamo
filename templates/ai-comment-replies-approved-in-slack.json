@@ -1,67 +1,99 @@
 {
-  "name": "Draft replies to social media comments with AI and approve them in Slack with Rizamo",
+  "name": "Triage social media comments with AI, hide spam and approve replies in Slack with Rizamo",
   "nodes": [
     {
       "parameters": {
-        "content": "## Draft replies to comments with AI and approve them in Slack\n\n### How it works\nFor brands and agencies that answer every comment but want a person to check each reply. When a comment arrives on an Instagram, Facebook, TikTok, YouTube or Threads post, OpenAI drafts a short reply in the comment's language. Spam and comments that need a person, such as complaints, are skipped.\n\nSlack then shows the comment and the draft with **Reply** and **Skip** buttons, and the workflow waits. Rizamo posts the reply under the comment only when someone chooses Reply. A draft cannot be edited from Slack: skip it and answer in Rizamo's inbox instead.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect OpenAI in **Draft a reply** and edit its instructions to your brand's voice.\n4. Connect Slack and pick the channel in **Ask for approval**.\n5. Activate the workflow. **New comment** creates its webhook in Rizamo, which needs an https address: n8n Cloud has one, and a self-hosted n8n needs a public one.\n\n### Customization\nPick profiles in **New comment** to answer one brand only, or change the model and its instructions in **Draft a reply**.",
-        "height": 660,
+        "content": "## Read and sort the comment\nOpenAI reads the comment with the thread so far and sorts it: reply, spam, needs a person or nothing to say.",
+        "height": 350,
+        "width": 1075,
+        "color": 7
+      },
+      "id": "da472d3f-c5d7-550c-8a26-32e4337819b7",
+      "name": "Section: sort",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -150
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Reply after a yes in Slack\nSlack shows the draft with Reply and Skip. A skipped comment stays open in Rizamo.",
+        "height": 310,
+        "width": 680,
+        "color": 7
+      },
+      "id": "4a4cff40-1470-50c4-b94a-63777e8d57d8",
+      "name": "Section: reply",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1055,
+        -530
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Hide spam\nHidden on its network, which Rizamo can undo. Where the network does not allow it, the comment stays open.",
+        "height": 320,
+        "width": 680,
+        "color": 7
+      },
+      "id": "2d445522-4e4d-5c6c-9c03-caf60e13747e",
+      "name": "Section: spam",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1055,
+        -150
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Flag the rest\nComplaints and order problems go to Slack and stay open in Rizamo's inbox.",
+        "height": 310,
+        "width": 680,
+        "color": 7
+      },
+      "id": "b95de0c5-d1ab-52fd-ad41-800909267ba8",
+      "name": "Section: person",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1055,
+        230
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Close what is handled\nReplied, hidden and empty comments are marked done in Rizamo.",
+        "height": 350,
+        "width": 380,
+        "color": 7
+      },
+      "id": "e42e6b42-f71c-5e48-9389-d94babd1c87e",
+      "name": "Section: done",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1775,
+        -150
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Triage social media comments with AI and approve replies in Slack\n\n### How it works\nFor brands and agencies that answer comments on Instagram, Facebook, TikTok, YouTube and Threads and want a person to check every reply. When a comment arrives, the workflow reads its thread in Rizamo, so OpenAI sees the conversation so far, and sorts it:\n\n- **Reply**: OpenAI drafts a short reply in the comment's language. Slack shows it with **Reply** and **Skip**, and Rizamo posts it only after a yes.\n- **Spam**: hidden on its network, which can be undone in Rizamo.\n- **Needs a person** (complaints, orders, anything sensitive): a Slack message tells the team.\n- **Nothing to say** (an emoji, a friend tagged): no reply.\n\nReplied, hidden and empty comments are then marked done, so Rizamo's inbox keeps only what a person still has to answer, skipped drafts included.\n\n### Setup\n1. Install the verified community node `@rizamohq/n8n-nodes-rizamo` (tested with 0.1.1): open the nodes panel, search **Rizamo** and choose **Install** ([installation guide](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)).\n2. In Rizamo, open **Developers**, create an API key and add it in n8n as a **Rizamo API** credential.\n3. Connect OpenAI in **Sort the comment** and describe your brand at the end of its instructions.\n4. Connect Slack and pick a channel in **Ask for approval** and **Alert the team**.\n5. Activate the workflow. **New comment** creates its webhook in Rizamo, which needs an https address: n8n Cloud has one, and a self-hosted n8n needs a public one.\n\n### Customization\nPick profiles in **New comment** to cover one brand only. To have spam checked by a person too, connect the Spam output of **Route** to **Alert the team** instead of **Hide spam**.",
+        "height": 720,
         "width": 520
       },
-      "id": "ff29ed45-bd06-5c06-a01b-a9de6c746960",
+      "id": "f954993d-7b67-5289-8fdc-3b2c2cb5db7b",
       "name": "About",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
         -620,
-        -300
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Draft a reply\nOpenAI writes a short reply, or SKIP for spam and comments that need a person.",
-        "height": 360,
-        "width": 780,
-        "color": 7
-      },
-      "id": "0aff1369-e498-55ba-85ba-aee06580eea1",
-      "name": "Section: draft",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -160
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Ask a person\nSlack shows the comment and the draft, and waits for Reply or Skip.",
-        "height": 360,
-        "width": 440,
-        "color": 7
-      },
-      "id": "b8978729-0a41-5b23-a866-8c4ba23d24ae",
-      "name": "Section: approve",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        760,
-        -160
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Reply\nRizamo posts the approved reply under the comment.",
-        "height": 360,
-        "width": 340,
-        "color": 7
-      },
-      "id": "c6836053-45f8-530e-8cab-d7b7b418e142",
-      "name": "Section: reply",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1240,
-        -160
+        -530
       ]
     },
     {
@@ -71,12 +103,28 @@
         ],
         "profileIds": []
       },
-      "id": "e4295522-0546-4771-a05b-da2da1133a81",
+      "id": "cb5387a8-5122-539b-b138-3bd1a872a263",
       "name": "New comment",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamoTrigger",
       "typeVersion": 1,
       "position": [
         0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "get",
+        "threadId": "={{ $json.data.threadId }}",
+        "messagesLimit": 10
+      },
+      "id": "4f28ffff-ee04-53bd-bfdc-ba9751f67179",
+      "name": "Read the thread",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        220,
         0
       ]
     },
@@ -91,56 +139,139 @@
           "values": [
             {
               "role": "system",
-              "content": "You reply to comments on a brand's social media posts. Write one short, friendly reply in the comment's language, at most two sentences, with no hashtags. If the comment is spam or needs a person (a complaint, an order problem), reply only with SKIP."
+              "content": "You sort comments on a brand's social media posts and draft replies. Answer in JSON with the keys category, reply and reason.\n\ncategory is one of:\n- reply: a question, a compliment or a remark the brand should answer.\n- spam: promotion, scams, bots, links to other accounts, offers to collaborate or to grow the account.\n- person: a complaint, an order, delivery or refund problem, anything legal or sensitive, or a question you cannot answer from what you know about the brand.\n- none: nothing to answer, such as an emoji alone or a friend tagged.\n\nreply: for reply only, one short, friendly reply in the comment's language, at most two sentences, with no hashtags. Empty otherwise.\nreason: a few words on why.\n\nAbout the brand: describe what it sells, its tone, and facts it is often asked about (opening hours, shipping, prices)."
             },
             {
-              "content": "=Comment from {{ $json.data.author.name }} on {{ $json.data.network }}:\n{{ $json.data.text }}"
+              "content": "=Network: {{ $('New comment').item.json.data.network }}\nEarlier in this thread:\n{{ $json.messages.filter((m) => m.id !== $('New comment').item.json.data.messageId).map((m) => (m.direction === 'out' ? 'Brand' : (m.author?.name || $json.thread.contact?.name || 'Them')) + ': ' + m.text).join('\\n') || 'nothing' }}\n\nNew comment from {{ $('New comment').item.json.data.author.name }}:\n{{ $('New comment').item.json.data.text }}"
             }
           ]
         },
+        "jsonOutput": true,
         "options": {
-          "temperature": 0.4
+          "temperature": 0.3
         }
       },
-      "id": "5b4a4b7f-36b4-4c5b-867f-4d32ca0396b3",
-      "name": "Draft a reply",
+      "id": "6847f59b-87aa-5e5b-8fdd-b5ce11dd0c13",
+      "name": "Sort the comment",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        280,
+        440,
         0
       ]
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 2
-          },
-          "conditions": [
+        "rules": {
+          "values": [
             {
-              "id": "bac2d145-5fee-46b7-a0e5-a4cd3c5490b6",
-              "leftValue": "={{ $json.message.content.trim() }}",
-              "rightValue": "SKIP",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9159d751-f37c-557a-98ba-050c69e99874",
+                    "leftValue": "={{ $json.message.content.category }}",
+                    "rightValue": "reply",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Reply"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "14e4cdae-a940-5b8e-8514-89748a7db936",
+                    "leftValue": "={{ $json.message.content.category }}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Spam"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7ea336e6-2011-5733-9f97-0f74ba6ed990",
+                    "leftValue": "={{ $json.message.content.category }}",
+                    "rightValue": "person",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Needs a person"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "46ef75a1-7c85-5645-8423-cfd54b6309db",
+                    "leftValue": "={{ $json.message.content.category }}",
+                    "rightValue": "none",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Nothing to say"
             }
-          ],
-          "combinator": "and"
+          ]
         },
-        "options": {}
+        "options": {
+          "fallbackOutput": 2
+        }
       },
-      "id": "665a6fc2-fe47-4324-9f4e-73d05eceb282",
-      "name": "Worth replying",
-      "type": "n8n-nodes-base.filter",
-      "typeVersion": 2.2,
+      "id": "3495335e-0a7d-5876-aa22-67ed2c2c6673",
+      "name": "Route",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
       "position": [
-        560,
+        785,
         0
       ]
     },
@@ -154,7 +285,7 @@
           "mode": "list",
           "value": ""
         },
-        "message": "=*New comment* from {{ $('New comment').item.json.data.author.name }} on {{ $('New comment').item.json.data.network }}:\n> {{ $('New comment').item.json.data.text }}\n\n*Draft reply:*\n{{ $json.message.content }}",
+        "message": "=*{{ $('New comment').item.json.data.author.name }}* commented on {{ (({ instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', threads: 'Threads', youtube: 'YouTube', linkedin: 'LinkedIn' })[$('New comment').item.json.data.network] ?? $('New comment').item.json.data.network) }}:\n> {{ $('New comment').item.json.data.text }}\n\n*Draft reply:*\n{{ $json.message.content.reply }}",
         "responseType": "approval",
         "approvalOptions": {
           "values": {
@@ -165,13 +296,13 @@
         },
         "options": {}
       },
-      "id": "60b9528f-6ff2-4d6b-912b-9e44444b13ef",
+      "id": "6f1e4a97-bcae-58d8-9aa1-c7e4e4ac51c5",
       "name": "Ask for approval",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
       "position": [
-        820,
-        0
+        1115,
+        -380
       ]
     },
     {
@@ -185,7 +316,7 @@
           },
           "conditions": [
             {
-              "id": "e20b5c2b-f690-4ced-ae67-1118711ef9ec",
+              "id": "e48eeaae-902d-5639-ae63-e35332dad163",
               "leftValue": "={{ $json.data.approved }}",
               "rightValue": "",
               "operator": {
@@ -199,13 +330,13 @@
         },
         "options": {}
       },
-      "id": "5161a9ca-71e7-48e6-96d9-d9d1c729faf4",
+      "id": "f3f29e0c-f5f6-50c8-99ef-ee036632ded2",
       "name": "Approved",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1040,
-        0
+        1335,
+        -380
       ]
     },
     {
@@ -213,14 +344,66 @@
         "resource": "thread",
         "operation": "reply",
         "threadId": "={{ $('New comment').item.json.data.threadId }}",
-        "text": "={{ $('Draft a reply').item.json.message.content.trim() }}"
+        "text": "={{ String($('Sort the comment').item.json.message.content.reply ?? '').trim() }}"
       },
-      "id": "ae986d2f-055d-41f7-8966-c9304e6647c5",
+      "id": "8b04f54e-edca-5be0-b229-c51f02f764ef",
       "name": "Reply",
       "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
       "typeVersion": 1,
       "position": [
-        1360,
+        1555,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "comment",
+        "operation": "hide",
+        "threadId": "={{ $('New comment').item.json.data.threadId }}",
+        "messageId": "={{ $('New comment').item.json.data.messageId }}"
+      },
+      "id": "4eac2a72-dd4b-56be-8c69-043775285d97",
+      "name": "Hide spam",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        1115,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "text": "=*Needs a person:* {{ $('New comment').item.json.data.author.name }} on {{ (({ instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', threads: 'Threads', youtube: 'YouTube', linkedin: 'LinkedIn' })[$('New comment').item.json.data.network] ?? $('New comment').item.json.data.network) }}\n> {{ $('New comment').item.json.data.text }}\n{{ $json.message.content.reason || 'Not sorted' }}. It stays open in Rizamo's inbox.",
+        "otherOptions": {}
+      },
+      "id": "b0804d6a-2cf8-5231-83a6-6b05b3c117ee",
+      "name": "Alert the team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1115,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "markDone",
+        "threadId": "={{ $('New comment').item.json.data.threadId }}"
+      },
+      "id": "7525d15f-2665-5a70-92a6-624049026394",
+      "name": "Mark done",
+      "type": "@rizamohq/n8n-nodes-rizamo.rizamo",
+      "typeVersion": 1,
+      "position": [
+        1835,
         0
       ]
     }
@@ -230,29 +413,61 @@
       "main": [
         [
           {
-            "node": "Draft a reply",
+            "node": "Read the thread",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Draft a reply": {
+    "Read the thread": {
       "main": [
         [
           {
-            "node": "Worth replying",
+            "node": "Sort the comment",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Worth replying": {
+    "Sort the comment": {
+      "main": [
+        [
+          {
+            "node": "Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route": {
       "main": [
         [
           {
             "node": "Ask for approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hide spam",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert the team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark done",
             "type": "main",
             "index": 0
           }
@@ -280,9 +495,32 @@
           }
         ]
       ]
+    },
+    "Reply": {
+      "main": [
+        [
+          {
+            "node": "Mark done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hide spam": {
+      "main": [
+        [
+          {
+            "node": "Mark done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "pinData": {}
 }
