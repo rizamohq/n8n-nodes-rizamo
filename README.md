@@ -2,6 +2,8 @@
 
 # n8n-nodes-rizamo
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rizamohq/n8n-nodes-rizamo)
+
 The [Rizamo](https://rizamo.com) nodes for [n8n](https://n8n.io): publish and schedule social posts on Instagram, Facebook, TikTok, YouTube and Threads, answer comments and messages, and read analytics, from your workflows.
 
 - **Rizamo:** posts, media, accounts, profiles, analytics, the inbox, comments and short links.
@@ -63,7 +65,7 @@ Built with n8n's node CLI 0.56 and tried on n8n 2.47 as an installed community p
 
 ## Resources
 
-- [Rizamo API docs](https://docs.rizamo.com)
+- [Rizamo API docs](https://docs.rizamo.com), and as text for agents: [llms.txt](https://docs.rizamo.com/llms.txt)
 - [Webhooks](https://docs.rizamo.com/webhooks)
 - [n8n community nodes](https://docs.n8n.io/integrations/#community-nodes)
 - Support: hi@rizamo.com
