@@ -55,6 +55,12 @@ function networkOptions(this: IExecuteFunctions, i: number): Record<string, IDat
 	for (const key of ['title', 'startsAt', 'endsAt', 'couponCode', 'redeemUrl', 'terms']) {
 		if (googleInput[key] !== undefined && googleInput[key] !== '') google[key] = googleInput[key];
 	}
+	// The date picker gives no offset, which the API refuses: sent in UTC, as Expires At. One it cannot read goes as typed,
+	// and the API says what is wrong with it.
+	for (const key of ['startsAt', 'endsAt']) {
+		const at = google[key] === undefined ? null : new Date(String(google[key]));
+		if (at && !Number.isNaN(at.getTime())) google[key] = at.toISOString();
+	}
 	if (googleInput.button) {
 		google.callToAction = {
 			type: googleInput.button,
