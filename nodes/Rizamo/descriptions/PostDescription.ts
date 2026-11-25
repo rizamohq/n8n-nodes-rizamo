@@ -328,6 +328,83 @@ const threadsOptions: INodeProperties = {
 	],
 };
 
+const googleOptions: INodeProperties = {
+	displayName: 'Google Business Profile Options',
+	name: 'googleOptions',
+	type: 'collection',
+	placeholder: 'Add Option',
+	default: {},
+	displayOptions: show(['create']),
+	description:
+		'Events and offers need a title, a start and an end. An offer also needs a coupon code, a redeem link or terms, one at least.',
+	options: [
+		{
+			displayName: 'Button',
+			name: 'button',
+			type: 'options',
+			options: [
+				{ name: 'Book', value: 'book' },
+				{ name: 'Buy', value: 'shop' },
+				{ name: 'Call Now', value: 'call' },
+				{ name: 'Learn More', value: 'learn_more' },
+				{ name: 'Order Online', value: 'order' },
+				{ name: 'Sign Up', value: 'sign_up' },
+			],
+			default: 'learn_more',
+			description: "Updates and events: a button under the post. Call Now dials the profile's phone number.",
+		},
+		{
+			displayName: 'Button Link',
+			name: 'buttonUrl',
+			type: 'string',
+			default: '',
+			description: 'Where the button opens: required for every button but Call Now',
+		},
+		{
+			displayName: 'Coupon Code',
+			name: 'couponCode',
+			type: 'string',
+			default: '',
+			description: 'Offers: a code people show in store or type online, up to 58 characters',
+		},
+		{
+			displayName: 'Ends At',
+			name: 'endsAt',
+			type: 'dateTime',
+			default: '',
+			description: 'Events and offers: when it ends',
+		},
+		{
+			displayName: 'Redeem Link',
+			name: 'redeemUrl',
+			type: 'string',
+			default: '',
+			description: 'Offers: where people redeem it online',
+		},
+		{
+			displayName: 'Starts At',
+			name: 'startsAt',
+			type: 'dateTime',
+			default: '',
+			description: 'Events and offers: when it starts',
+		},
+		{
+			displayName: 'Terms',
+			name: 'terms',
+			type: 'string',
+			default: '',
+			description: 'Offers: terms and conditions, up to 1,500 characters',
+		},
+		{
+			displayName: 'Title',
+			name: 'title',
+			type: 'string',
+			default: '',
+			description: 'Events and offers: the title Google shows, up to 58 characters',
+		},
+	],
+};
+
 export const postFields: INodeProperties[] = [
 	/* ---------------- create ---------------- */
 	{
@@ -450,7 +527,9 @@ export const postFields: INodeProperties[] = [
 				type: 'options',
 				options: [
 					{ name: 'Carousel', value: 'carousel' },
+					{ name: 'Event (Google Business Profile)', value: 'event' },
 					{ name: 'Feed', value: 'feed' },
+					{ name: 'Offer (Google Business Profile)', value: 'offer' },
 					{ name: 'Photo', value: 'photo' },
 					{ name: 'Reel', value: 'reel' },
 					{ name: 'Short', value: 'short' },
@@ -475,6 +554,7 @@ export const postFields: INodeProperties[] = [
 	youtubeOptions,
 	facebookOptions,
 	threadsOptions,
+	googleOptions,
 
 	/* ---------------- get, publish, delete ---------------- */
 	{

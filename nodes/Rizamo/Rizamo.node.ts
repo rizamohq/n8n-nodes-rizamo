@@ -49,7 +49,20 @@ function networkOptions(this: IExecuteFunctions, i: number): Record<string, IDat
 	const threads = { ...(this.getNodeParameter('threadsOptions', i, {}) as IDataObject) };
 	for (const key of ['linkAttachment', 'topicTag']) if (threads[key] === '') delete threads[key];
 
-	return { tiktok, instagram, youtube, facebook, threads };
+	// Google Business Profile's button is one object, `callToAction` ({ type, url }); the rest go as they are.
+	const googleInput = this.getNodeParameter('googleOptions', i, {}) as IDataObject;
+	const google: IDataObject = {};
+	for (const key of ['title', 'startsAt', 'endsAt', 'couponCode', 'redeemUrl', 'terms']) {
+		if (googleInput[key] !== undefined && googleInput[key] !== '') google[key] = googleInput[key];
+	}
+	if (googleInput.button) {
+		google.callToAction = {
+			type: googleInput.button,
+			...(googleInput.button !== 'call' && googleInput.buttonUrl ? { url: googleInput.buttonUrl } : {}),
+		};
+	}
+
+	return { tiktok, instagram, youtube, facebook, threads, google };
 }
 
 async function createPost(this: IExecuteFunctions, i: number): Promise<IDataObject> {
@@ -148,7 +161,7 @@ export class Rizamo implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Publish and schedule social posts on Instagram, Facebook, TikTok, YouTube and Threads, answer comments and messages, and read analytics',
+			'Publish and schedule social posts on Instagram, Facebook, TikTok, YouTube, Threads and Google Business Profile, answer comments, messages and reviews, and read analytics',
 		defaults: { name: 'Rizamo' },
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],

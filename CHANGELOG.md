@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+- Google Business Profile: its options on Create Post (a button, an event's or an offer's title, start and end, an offer's coupon code, redeem link and terms) and the Event and Offer formats.
+- Rizamo Trigger: Review Received and Review Updated.
+
 ## 0.1.1
 
 - Create Post takes account IDs as a list or separated by commas, so an expression can map them from a sheet. The trigger takes profile IDs the same way.
