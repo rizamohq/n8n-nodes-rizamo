@@ -35,6 +35,8 @@ const EVENTS: Array<{ name: string; value: string; description: string }> = [
 	{ name: 'Post Target Updated', value: 'post.target.updated', description: "A post's details on one network changed" },
 	{ name: 'Post Unscheduled', value: 'post.unscheduled', description: 'A scheduled post went back to draft' },
 	{ name: 'Post Updated', value: 'post.updated', description: 'A post was edited' },
+	{ name: 'Review Received', value: 'review.received', description: 'A new Google Business Profile review arrived in the inbox' },
+	{ name: 'Review Updated', value: 'review.updated', description: 'A review changed, or Google decided on the reply' },
 ];
 
 /** Older than this, a delivery is refused as a replay (Standard Webhooks). */

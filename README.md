@@ -4,10 +4,10 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rizamohq/n8n-nodes-rizamo)
 
-The [Rizamo](https://rizamo.com) nodes for [n8n](https://n8n.io): publish and schedule social posts on Instagram, Facebook, TikTok, YouTube and Threads, answer comments and messages, and read analytics, from your workflows.
+The [Rizamo](https://rizamo.com) nodes for [n8n](https://n8n.io): publish and schedule social posts on Instagram, Facebook, TikTok, YouTube, Threads and Google Business Profile, answer comments, messages and reviews, and read analytics, from your workflows.
 
 - **Rizamo:** posts, media, accounts, profiles, analytics, the inbox, comments and short links.
-- **Rizamo Trigger:** starts a workflow when a post goes out or fails, a comment or message arrives, or an account disconnects.
+- **Rizamo Trigger:** starts a workflow when a post goes out or fails, a comment, message or review arrives, or an account disconnects.
 
 ## Installation
 
@@ -50,6 +50,8 @@ The trigger offers every Rizamo event, such as `post.published`, `post.failed`, 
 **TikTok.** TikTok has no defaults: under TikTok Options add each choice the post needs (comments, Duet, Stitch, your brand, branded content, AI-generated, privacy for photos) and Consent, which says the account's owner agreed to these choices and TikTok's Music Usage Confirmation. Get TikTok Creator Info shows what the account allows. Or choose Send to TikTok Inbox, and the owner finishes the post in the TikTok app. Rizamo's error names any choice that is missing.
 
 **YouTube.** Made for Kids is required to schedule or publish.
+
+**Google Business Profile.** Choose Event or Offer as the format for those; both need a title, a start and an end, and an offer also needs a coupon code, a redeem link or terms. A button (Book, Order Online, Buy, Learn More, Sign Up, Call Now) goes on updates and events.
 
 **Retries.** Every write sends an idempotency key, so when n8n tries a node again in the same execution, Rizamo answers with the first result instead of posting twice.
 

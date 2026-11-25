@@ -1,7 +1,7 @@
 {
     "name": "@rizamohq/n8n-nodes-rizamo",
-    "version": "0.1.1",
-    "description": "n8n nodes for Rizamo: publish and schedule social posts on Instagram, Facebook, TikTok, YouTube and Threads, answer comments and messages, and read analytics.",
+    "version": "0.2.0",
+    "description": "n8n nodes for Rizamo: publish and schedule social posts on Instagram, Facebook, TikTok, YouTube, Threads and Google Business Profile, answer comments, messages and reviews, and read analytics.",
     "license": "MIT",
     "homepage": "https://github.com/rizamohq/n8n-nodes-rizamo#readme",
     "keywords": [
@@ -14,6 +14,7 @@
         "youtube",
         "facebook",
         "threads",
+        "google-business-profile",
         "scheduling"
     ],
     "author": {
